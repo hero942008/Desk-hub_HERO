@@ -1,0 +1,11 @@
+.gradle/
+build/
+*.jks
+*.keystore
+# …except the public test keystore committed for release signing.
+# See keystore/README.md for the security model (intentionally public).
+!keystore/bannerhub.keystore
+local.properties
+.idea/
+*.iml
+.DS_Store
