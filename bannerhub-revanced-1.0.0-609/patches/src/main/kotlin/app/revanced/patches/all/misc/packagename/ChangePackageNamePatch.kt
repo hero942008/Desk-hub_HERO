@@ -31,14 +31,13 @@ fun setOrGetFallbackPackageName(fallbackPackageName: String): String {
 
 val changePackageNamePatch = resourcePatch(
     name = "Change package name",
-    description = "Appends \".revanced\" to the package name by default. " +
-        "Changing the package name of the app can lead to unexpected issues.",
-    use = false,
+    description = "Changes the package name of the app to allow side-by-side installation.",
+    use = true,
 ) {
     packageNameOption = stringOption(
         name = "packageName",
-        default = "Default",
-        values = mapOf("Default" to "Default"),
+        default = "com.xiaoji.egggame.mod",
+        values = mapOf("Default" to "com.xiaoji.egggame.mod"),
         description = "The name of the package to rename the app to.",
         required = true,
     ) {
@@ -47,7 +46,7 @@ val changePackageNamePatch = resourcePatch(
 
     val updatePermissions by booleanOption(
         name = "updatePermissions",
-        default = false,
+        default = true,
         description = "Update compatibility receiver permissions. " +
             "Enabling this can fix installation errors, but this can also break features in certain apps.",
     )
@@ -86,10 +85,10 @@ val changePackageNamePatch = resourcePatch(
             }
 
             val replacementPackageName = packageNameOption.value
-            val newPackageName = if (replacementPackageName != packageNameOption.default) {
-                replacementPackageName!!
+            val newPackageName = if (replacementPackageName != null && replacementPackageName != "Default") {
+                replacementPackageName
             } else {
-                "$packageName.revanced"
+                packageNameOption.default ?: "$packageName.mod"
             }
 
             manifest.setAttribute("package", newPackageName)

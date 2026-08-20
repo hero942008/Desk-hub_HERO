@@ -1,0 +1,32 @@
+[package]
+name = "xserver_rust"
+version = "1.0.0"
+edition = "2021"
+authors = ["BannerHub Developers"]
+description = "Ultra-fast Vulkan-primary native XServer renderer and frame readout pipeline for BannerHub ReVanced"
+license = "MIT OR Apache-2.0"
+
+[lib]
+name = "xserver"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# Zero-overhead minimal dependencies for native Android aarch64 runtime
+log = "0.4"
+android_logger = "0.13"
+crossbeam-queue = "0.3"
+crossbeam-utils = "0.8"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+overflow-checks = false
+strip = "symbols"
+debug = false
+incremental = false
+
+[profile.bench]
+opt-level = 3
+lto = "fat"

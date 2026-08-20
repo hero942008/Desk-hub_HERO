@@ -32,7 +32,7 @@ public class BhRendererSettingsActivity extends Activity {
     public static final String EXTRA_GAME_NAME = "gameName";
 
     private static final String[] MODE_LABELS = {
-        "New (Vulkan) — default", "Legacy (GLES2)",
+        "Vulkan 1.3 (Primary / Rust Core) — Default", "Legacy (GLES2 Compatibility)",
     };
 
     private float density = 1f;

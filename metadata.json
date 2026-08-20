@@ -1,6 +1,6 @@
 {
-  "name": "BannerHub ReVanced",
-  "description": "Source code and build environment for BannerHub ReVanced Android project (v1.0.0-609).",
+  "name": "BannerHub Mod",
+  "description": "BannerHub Mod Android project with high-performance Rust native core and Vulkan primary rendering engine.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -2,7 +2,7 @@ group = "com.github.the412banner"
 
 patches {
     about {
-        name = "BannerHub for ReVanced"
+        name = "BannerHub Mod"
         description = "BannerHub patches for GameHub — community configs, frontend export, download manager, and more."
         source = "https://github.com/The412Banner/bannerhub-revanced"
         author = "The412Banner"

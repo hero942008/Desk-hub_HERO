@@ -8,11 +8,11 @@ import org.w3c.dom.Element
 val changeAppNamePatch = resourcePatch(
     name = "Change app name",
     description = "Changes the display name of the app in the launcher.",
-    use = false,
+    use = true,
 ) {
     val appName by stringOption(
         name = "appName",
-        default = null,
+        default = "BannerHub Mod",
         description = "The name to display in the launcher.",
         required = true,
     )
