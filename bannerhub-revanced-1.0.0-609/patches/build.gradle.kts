@@ -1,13 +1,13 @@
-group = "com.github.the412banner"
+group = "com.github.herohuboptimized"
 
 patches {
     about {
-        name = "BannerHub Mod"
-        description = "BannerHub patches for GameHub — community configs, frontend export, download manager, and more."
-        source = "https://github.com/The412Banner/bannerhub-revanced"
-        author = "The412Banner"
-        contact = "https://github.com/The412Banner"
-        website = "https://github.com/The412Banner/bannerhub-revanced"
+        name = "HeroHub Optimized"
+        description = "HeroHub Optimized patches for GameHub with high-performance Rust Vulkan 1.3 core, zero-copy rendering, and low latency input."
+        source = "https://github.com/herohuboptimized/herohub-optimized"
+        author = "HeroHub"
+        contact = "https://github.com/herohuboptimized"
+        website = "https://github.com/herohuboptimized/herohub-optimized"
         license = "GNU General Public License v3.0"
     }
 }

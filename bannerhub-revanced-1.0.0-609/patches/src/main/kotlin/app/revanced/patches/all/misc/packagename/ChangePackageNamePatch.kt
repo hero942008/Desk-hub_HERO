@@ -36,8 +36,8 @@ val changePackageNamePatch = resourcePatch(
 ) {
     packageNameOption = stringOption(
         name = "packageName",
-        default = "com.xiaoji.egggame.mod",
-        values = mapOf("Default" to "com.xiaoji.egggame.mod"),
+        default = "com.xj.herohuboptimized",
+        values = mapOf("Default" to "com.xj.herohuboptimized"),
         description = "The name of the package to rename the app to.",
         required = true,
     ) {

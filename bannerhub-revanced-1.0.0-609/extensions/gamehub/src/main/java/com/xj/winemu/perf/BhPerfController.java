@@ -245,6 +245,12 @@ public final class BhPerfController {
     // ── sysfs ops (run on worker thread only) ───────────────────────────────
 
     private boolean applySustained() {
+        // Native CPU Big Core Affinity Pinning & Real-Time Priority
+        try {
+            com.xj.winemu.nativecore.BhNativeCore.pinBigCores();
+            com.xj.winemu.nativecore.BhNativeCore.setRealtimePriority(3);
+        } catch (Throwable ignored) {}
+
         // for f in cpu*/.../scaling_governor; do echo performance > "$f"; done
         return BhPerfRoot.runScript(
                 "for f in " + CPU_GOV_GLOB + "; do echo " + GOV_PERFORMANCE

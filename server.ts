@@ -42,10 +42,10 @@ async function startServer() {
 
     res.json({
       exists: true,
-      name: "BannerHub ReVanced",
-      version: "v1.0.0-609",
-      sourceUrl: "https://github.com/The412Banner/bannerhub-revanced/archive/refs/tags/v1.0.0-609.zip",
-      targetApp: "XiaoJi GameHub 6.0.8 / 6.0.9 (com.xiaoji.egggame)",
+      name: "HeroHub Optimized",
+      version: "v1.0.0-609-opt",
+      sourceUrl: "https://github.com/herohuboptimized/herohub-optimized",
+      targetApp: "HeroHub Optimized (com.xj.herohuboptimized)",
       totalFiles: filesCount,
       projectPath: PROJECT_DIR,
       status: "ready"

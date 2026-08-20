@@ -156,15 +156,16 @@ jobs:
         # side-by-side via different package names, same pattern as the two AnTuTu
         # variants which share "BannerHub v6 AnTuTu".
         variant:
-          - { name: Normal,         pkg: "banner.hub",                 label: "BannerHub v6" }
-          - { name: Normal-GHL,     pkg: "gamehub.lite",               label: "BannerHub v6" }
-          - { name: PuBG,           pkg: "com.tencent.ig",             label: "BannerHub v6 PuBG" }
-          - { name: AnTuTu,         pkg: "com.antutu.ABenchMark",      label: "BannerHub v6 AnTuTu" }
-          - { name: alt-AnTuTu,     pkg: "com.antutu.benchmark.full",  label: "BannerHub v6 AnTuTu" }
-          - { name: PuBG-CrossFire, pkg: "com.tencent.tmgp.cf",        label: "BannerHub v6 PuBG CrossFire" }
-          - { name: Ludashi,        pkg: "com.ludashi.aibench",        label: "BannerHub v6 Ludashi" }
-          - { name: Genshin,        pkg: "com.miHoYo.GenshinImpact",   label: "BannerHub v6 Genshin" }
-          - { name: Original,       pkg: "com.xiaoji.egggame",         label: "BannerHub v6" }
+          - { name: HeroHub-Optimized, pkg: "com.xj.herohuboptimized",     label: "HeroHub Optimized" }
+          - { name: Normal,            pkg: "banner.hub",                 label: "HeroHub v6" }
+          - { name: Normal-GHL,        pkg: "gamehub.lite",               label: "HeroHub v6" }
+          - { name: PuBG,              pkg: "com.tencent.ig",             label: "HeroHub v6 PuBG" }
+          - { name: AnTuTu,            pkg: "com.antutu.ABenchMark",      label: "HeroHub v6 AnTuTu" }
+          - { name: alt-AnTuTu,        pkg: "com.antutu.benchmark.full",  label: "HeroHub v6 AnTuTu" }
+          - { name: PuBG-CrossFire,    pkg: "com.tencent.tmgp.cf",        label: "HeroHub v6 PuBG CrossFire" }
+          - { name: Ludashi,           pkg: "com.ludashi.aibench",        label: "HeroHub v6 Ludashi" }
+          - { name: Genshin,           pkg: "com.miHoYo.GenshinImpact",   label: "HeroHub v6 Genshin" }
+          - { name: Original,          pkg: "com.xiaoji.egggame",         label: "HeroHub v6" }
     steps:
       - name: Checkout
         # Needed so the apksigner step can read keystore/bannerhub.keystore.

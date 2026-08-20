@@ -12,7 +12,7 @@ val changeAppNamePatch = resourcePatch(
 ) {
     val appName by stringOption(
         name = "appName",
-        default = "BannerHub Mod",
+        default = "HeroHub Optimized",
         description = "The name to display in the launcher.",
         required = true,
     )

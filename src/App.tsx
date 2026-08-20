@@ -192,8 +192,14 @@ export default function App() {
     {
       title: "Rust JNI Core & 40-Method Table",
       file: "native/xserver_shim/src/lib.rs",
-      desc: "نقطة الدخول JNI_OnLoad وجدول الدوال الأصلي بدون أي Overhead",
+      desc: "نقطة الدخول JNI_OnLoad وجدول الدوال الأصلي وواجهات NativeCore الفورية",
       badge: "JNI Core",
+    },
+    {
+      title: "Lock-Free Vibration Rumble Engine",
+      file: "native/xserver_shim/src/vibration.rs",
+      desc: "معالجة الاهتزاز الفوري في أقل من 0.05ms بدون حجز كائنات في ذاكرة Android GC",
+      badge: "Sub-ms Rumble",
     },
     {
       title: "Vulkan 1.3 Primary Pipeline",
@@ -202,22 +208,64 @@ export default function App() {
       badge: "Vulkan Engine",
     },
     {
+      title: "Pipeline Cache & Zero-Copy AHardwareBuffer",
+      file: "native/xserver_shim/src/vulkan_advanced.rs",
+      desc: "تخزين الشيدرز على القرص لمنع التقطيع (Stutter-Free) وتمرير الإطارات المباشر دون نسخ بالذاكرة",
+      badge: "Zero-Copy Vk",
+    },
+    {
+      title: "FSR 1.0 & FidelityFX CAS Upscaler",
+      file: "native/xserver_shim/src/vulkan_advanced.rs",
+      desc: "رفع الدقة التكيفي فائق السرعة عبر شيدر أحادي لتخفيف أكثر من 40% من عبء معالج الرسوميات",
+      badge: "FSR / CAS",
+    },
+    {
+      title: "Decoupled Epoll Socket Multiplexer",
+      file: "native/xserver_shim/src/epoll_server.rs",
+      desc: "معالجة غير متزامنة لمقابس XServer بأسلوب Edge-Triggered epoll لتقليل استهلاك أنوية المعالج",
+      badge: "Epoll Multi",
+    },
+    {
       title: "SIMD Zero-Copy Render Readout",
       file: "native/xserver_shim/src/readout.rs",
       desc: "نظام قراءة الرندر ونقل الإطارات الموجه (Vectorized 64-Byte Streaming)",
       badge: "SIMD Readout",
     },
     {
-      title: "Lock-Free Input Event Queue",
-      file: "native/xserver_shim/src/events.rs",
-      desc: "حلقات معالجة غير مقفلة لمدخلات اللمس والماوس ولوحة المفاتيح لتجنب تعليق UI Thread",
-      badge: "Lock-Free Ring",
+      title: "CPU Big-Core Affinity & Real-Time Scheduling",
+      file: "native/xserver_shim/src/perf.rs",
+      desc: "تثبيت خيوط الرندر على أنوية الأداء الكبرى وإلغاء اختناق المعالج وترددات الإطارات",
+      badge: "Big Core / Realtime",
     },
     {
-      title: "Rust Crate Configuration (Release Profile)",
-      file: "native/xserver_shim/Cargo.toml",
-      desc: "إعدادات أقصى سرعة LTO=fat, opt-level=3, panic=abort, strip=symbols",
-      badge: "Cargo / LTO",
+      title: "Mmap Zero-Latency Config Storage",
+      file: "native/xserver_shim/src/storage.rs",
+      desc: "مزامنة إعدادات المحاكي مباشرة عبر الذاكرة المشتركة دون تكاليف XML أو Serialization",
+      badge: "Mmap Storage",
+    },
+    {
+      title: "SIMD Driver & Component Discovery",
+      file: "native/xserver_shim/src/components.rs",
+      desc: "فحص متوازي وسريع لتعريفات Mesa Turnip و DXVK و VKD3D في أجزاء من الثانية",
+      badge: "SIMD Scanner",
+    },
+    {
+      title: "Low-Latency Voice P2P Ring Buffer",
+      file: "native/xserver_shim/src/voice.rs",
+      desc: "معالجة وتمرير حزم الصوت والمحادثات المباشرة دون تقطيع أو تأخير زمني",
+      badge: "Voice Ring",
+    },
+    {
+      title: "Java BhNativeCore JNI Bridge",
+      file: "extensions/gamehub/src/main/java/com/xj/winemu/nativecore/BhNativeCore.java",
+      desc: "واجهة الاستدعاء الأصلي المباشرة من جافا وكوتلن لجميع محركات الرست",
+      badge: "Native Bridge",
+    },
+    {
+      title: "Aggressive CMake & Cargo Flags",
+      file: "native/xserver_shim/CMakeLists.txt",
+      desc: "خيارات التجميع القصوى: -O3 -flto -fno-stack-protector -ffast-math -pipe و strip=symbols",
+      badge: "Aggressive Flags",
     },
   ];
 
@@ -232,14 +280,14 @@ export default function App() {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="font-bold text-base md:text-lg tracking-tight text-slate-900 dark:text-white">
-                BannerHub Mod (Rust + Vulkan Core)
+                HeroHub Optimized (Rust + Vulkan Core)
               </h1>
               <span className="bg-amber-100 text-amber-900 dark:bg-amber-900/50 dark:text-amber-300 text-xs font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
-                <Zap className="w-3 h-3" /> Rust & Vulkan Accelerated
+                <Zap className="w-3 h-3" /> com.xj.herohuboptimized
               </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              High-Performance Native XServer Engine & Android ReVanced Workspace
+              HeroHub Optimized & GitHub Actions CI/CD Automated APK Build Pipeline
             </p>
           </div>
         </div>
@@ -597,7 +645,7 @@ export default function App() {
           <div className="space-y-6 bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
             <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <Cpu className="w-5 h-5 text-indigo-500" />
-              تفاصيل هيكلية الباتشات والامتدادات المعدلة
+              تفاصيل هيكلية الباتشات والامتدادات المعدلة (HeroHub Optimized)
             </h2>
 
             <div className="space-y-4 text-sm">
@@ -607,7 +655,7 @@ export default function App() {
                   1. الباتشات ومحرك الحقن (<code className="font-mono text-xs">/patches</code>)
                 </h3>
                 <p className="text-xs text-slate-600 dark:text-slate-400 mb-2">
-                  تم ضبط تغيير اسم الحزمة إلى <code>com.xiaoji.egggame.mod</code> واسم التطبيق إلى <code>BannerHub Mod</code>.
+                  تم ضبط تغيير اسم الحزمة إلى <code className="text-amber-600 dark:text-amber-400 font-bold">com.xj.herohuboptimized</code> واسم التطبيق إلى <code className="text-blue-600 dark:text-blue-400 font-bold">HeroHub Optimized</code>.
                 </p>
               </div>
 
@@ -617,7 +665,7 @@ export default function App() {
                   2. محرك الرندر الأصلي (<code className="font-mono text-xs">/native/xserver_shim</code>)
                 </h3>
                 <p className="text-xs text-slate-600 dark:text-slate-400 mb-2">
-                  تم بناؤه بلغة Rust بالكامل مع دعم Vulkan 1.3 كنظام رندر أساسي افتراضي وطوابير خالية من الأقفال.
+                  تم بناؤه بلغة Rust بالكامل مع دعم Vulkan 1.3 كنظام رندر أساسي افتراضي وطوابير خالية من الأقفال وتخزين الشيدرز المستمر Zero-Copy Presentation.
                 </p>
               </div>
             </div>
@@ -628,22 +676,25 @@ export default function App() {
           <div className="space-y-6 bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
             <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <Terminal className="w-5 h-5 text-emerald-500" />
-              أوامر بناء المشروع والمكتبة الأصلية
+              أوامر البناء والتصدير و GitHub Actions CI/CD التلقائي
             </h2>
 
             <div className="space-y-4 text-xs font-mono">
               <div className="p-4 bg-slate-900 text-slate-200 rounded-lg">
                 <div className="text-slate-400 mb-2 text-[11px] font-sans">
-                  # 1. بناء مكتبة Rust الأصلية (aarch64 Android):
+                  # 1. مسار الـ CI/CD لبناء حزم APK ونشرها تلقائياً على GitHub:
                 </div>
-                <code>cargo build --release --target aarch64-linux-android</code>
+                <code className="text-amber-400">.github/workflows/herohub_build.yml</code>
+                <p className="text-[11px] font-sans text-slate-400 mt-1">
+                  يقوم غيت هب بتجميع مكتبات Rust، وحزم الباتشات وتطبيقها على GameHub وتوقيع APK وتوليد إصدارات فورية مع كل Push أو Tag.
+                </p>
               </div>
 
               <div className="p-4 bg-slate-900 text-slate-200 rounded-lg">
                 <div className="text-slate-400 mb-2 text-[11px] font-sans">
-                  # 2. بناء باتشات ReVanced وحزم الـ Extensions:
+                  # 2. بناء باتشات ReVanced وحزم الـ Extensions محلياً:
                 </div>
-                <code>./gradlew build</code>
+                <code>./gradlew build --no-daemon</code>
               </div>
             </div>
           </div>

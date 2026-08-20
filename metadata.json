@@ -1,6 +1,6 @@
 {
-  "name": "BannerHub Mod",
-  "description": "BannerHub Mod Android project with high-performance Rust native core and Vulkan primary rendering engine.",
+  "name": "HeroHub Optimized",
+  "description": "HeroHub Optimized (herohuboptimized) - High-performance GameHub Android ReVanced modification with Rust Vulkan 1.3 native core and automated GitHub Actions CI/CD APK build pipelines.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
