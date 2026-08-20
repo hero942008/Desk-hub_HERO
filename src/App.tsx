@@ -190,78 +190,91 @@ export default function App() {
 
   const rustModules = [
     {
+      id: "jni-core",
       title: "Rust JNI Core & 40-Method Table",
       file: "native/xserver_shim/src/lib.rs",
       desc: "نقطة الدخول JNI_OnLoad وجدول الدوال الأصلي وواجهات NativeCore الفورية",
       badge: "JNI Core",
     },
     {
+      id: "vibration-engine",
       title: "Lock-Free Vibration Rumble Engine",
       file: "native/xserver_shim/src/vibration.rs",
       desc: "معالجة الاهتزاز الفوري في أقل من 0.05ms بدون حجز كائنات في ذاكرة Android GC",
       badge: "Sub-ms Rumble",
     },
     {
+      id: "vulkan-primary",
       title: "Vulkan 1.3 Primary Pipeline",
       file: "native/xserver_shim/src/vulkan_renderer.rs",
       desc: "إدارة Swapchain ثلاثي المخزن (Mailbox) وربط ANativeWindow المباشر",
       badge: "Vulkan Engine",
     },
     {
+      id: "pipeline-cache",
       title: "Pipeline Cache & Zero-Copy AHardwareBuffer",
       file: "native/xserver_shim/src/vulkan_advanced.rs",
       desc: "تخزين الشيدرز على القرص لمنع التقطيع (Stutter-Free) وتمرير الإطارات المباشر دون نسخ بالذاكرة",
       badge: "Zero-Copy Vk",
     },
     {
+      id: "fsr-cas",
       title: "FSR 1.0 & FidelityFX CAS Upscaler",
       file: "native/xserver_shim/src/vulkan_advanced.rs",
       desc: "رفع الدقة التكيفي فائق السرعة عبر شيدر أحادي لتخفيف أكثر من 40% من عبء معالج الرسوميات",
       badge: "FSR / CAS",
     },
     {
+      id: "epoll-mux",
       title: "Decoupled Epoll Socket Multiplexer",
       file: "native/xserver_shim/src/epoll_server.rs",
       desc: "معالجة غير متزامنة لمقابس XServer بأسلوب Edge-Triggered epoll لتقليل استهلاك أنوية المعالج",
       badge: "Epoll Multi",
     },
     {
+      id: "simd-readout",
       title: "SIMD Zero-Copy Render Readout",
       file: "native/xserver_shim/src/readout.rs",
       desc: "نظام قراءة الرندر ونقل الإطارات الموجه (Vectorized 64-Byte Streaming)",
       badge: "SIMD Readout",
     },
     {
+      id: "big-core",
       title: "CPU Big-Core Affinity & Real-Time Scheduling",
       file: "native/xserver_shim/src/perf.rs",
       desc: "تثبيت خيوط الرندر على أنوية الأداء الكبرى وإلغاء اختناق المعالج وترددات الإطارات",
       badge: "Big Core / Realtime",
     },
     {
+      id: "mmap-storage",
       title: "Mmap Zero-Latency Config Storage",
       file: "native/xserver_shim/src/storage.rs",
       desc: "مزامنة إعدادات المحاكي مباشرة عبر الذاكرة المشتركة دون تكاليف XML أو Serialization",
       badge: "Mmap Storage",
     },
     {
+      id: "simd-scanner",
       title: "SIMD Driver & Component Discovery",
       file: "native/xserver_shim/src/components.rs",
       desc: "فحص متوازي وسريع لتعريفات Mesa Turnip و DXVK و VKD3D في أجزاء من الثانية",
       badge: "SIMD Scanner",
     },
     {
+      id: "voice-ring",
       title: "Low-Latency Voice P2P Ring Buffer",
       file: "native/xserver_shim/src/voice.rs",
       desc: "معالجة وتمرير حزم الصوت والمحادثات المباشرة دون تقطيع أو تأخير زمني",
       badge: "Voice Ring",
     },
     {
+      id: "java-bridge",
       title: "Java BhNativeCore JNI Bridge",
       file: "extensions/gamehub/src/main/java/com/xj/winemu/nativecore/BhNativeCore.java",
       desc: "واجهة الاستدعاء الأصلي المباشرة من جافا وكوتلن لجميع محركات الرست",
       badge: "Native Bridge",
     },
     {
+      id: "aggressive-flags",
       title: "Aggressive CMake & Cargo Flags",
       file: "native/xserver_shim/CMakeLists.txt",
       desc: "خيارات التجميع القصوى: -O3 -flto -fno-stack-protector -ffast-math -pipe و strip=symbols",
@@ -495,7 +508,7 @@ export default function App() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {rustModules.map((m) => (
                   <div
-                    key={m.file}
+                    key={m.id}
                     onClick={() => {
                       setSelectedFilePath(m.file);
                       setActiveTab("explorer");
@@ -534,11 +547,11 @@ export default function App() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-sm">اسم الحزمة والمشروع</h3>
-                    <p className="text-xs text-slate-500">BannerHub Mod</p>
+                    <p className="text-xs text-slate-500">HeroHub Optimized</p>
                   </div>
                 </div>
                 <p className="text-xs text-slate-600 dark:text-slate-400">
-                  حزمة <code className="text-blue-600 font-mono">com.xiaoji.egggame.mod</code>
+                  حزمة <code className="text-blue-600 font-mono">com.xj.herohuboptimized</code>
                 </p>
               </div>
 
