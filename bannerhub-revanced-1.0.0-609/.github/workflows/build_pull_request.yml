@@ -16,18 +16,54 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      - name: Auto-detect workspace directory
+        run: |
+          if [ -d "bannerhub-revanced-1.0.0-609" ] && [ -f "bannerhub-revanced-1.0.0-609/gradlew" ]; then
+            echo "Working from bannerhub-revanced-1.0.0-609 directory..."
+            cp -r bannerhub-revanced-1.0.0-609/* .
+          fi
+          chmod +x gradlew 2>/dev/null || true
+          mkdir -p gradle/wrapper
+          # Ensure valid gradle-wrapper.jar with Main-Class attribute
+          python3 -c '
+          import zipfile, shutil, os, urllib.request
+          jar_path = "gradle/wrapper/gradle-wrapper.jar"
+          valid = False
+          if os.path.exists(jar_path):
+              try:
+                  with zipfile.ZipFile(jar_path, "r") as z:
+                      mf = z.read("META-INF/MANIFEST.MF").decode("utf-8", errors="ignore")
+                      if "Main-Class:" in mf and "GradleWrapperMain" in mf:
+                          valid = True
+              except Exception:
+                  valid = False
+          if not valid:
+              print("Repairing gradle-wrapper.jar manifest...")
+              try:
+                  urllib.request.urlretrieve("https://raw.githubusercontent.com/gradle/gradle/v8.10.2/gradle/wrapper/gradle-wrapper.jar", "/tmp/raw-wrapper.jar")
+                  with zipfile.ZipFile("/tmp/raw-wrapper.jar", "r") as zin, zipfile.ZipFile("/tmp/fixed-wrapper.jar", "w") as zout:
+                      for item in zin.infolist():
+                          buf = zin.read(item.filename)
+                          if item.filename == "META-INF/MANIFEST.MF":
+                              buf = b"Manifest-Version: 1.0\r\nMain-Class: org.gradle.wrapper.GradleWrapperMain\r\nImplementation-Title: Gradle Wrapper\r\n\r\n"
+                          zout.writestr(item, buf)
+                  shutil.copy2("/tmp/fixed-wrapper.jar", jar_path)
+              except Exception as e:
+                  print("Wrapper download/fix error:", e)
+          '
+
       - name: Setup Java
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v4
         with:
           distribution: "temurin"
           java-version: "17"
 
       - name: Cache Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v4
         with:
           validate-wrappers: false
 
@@ -36,4 +72,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ORG_GRADLE_PROJECT_githubPackagesUsername: ${{ github.actor }}
           ORG_GRADLE_PROJECT_githubPackagesPassword: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew build --no-daemon
+        run: |
+          if ! ./gradlew --version >/dev/null 2>&1; then
+            echo "Gradle wrapper check failed, regenerating wrapper via gradle CLI..."
+            gradle wrapper --gradle-version 8.10.2 || true
+          fi
+          ./gradlew build --no-daemon || gradle build --no-daemon

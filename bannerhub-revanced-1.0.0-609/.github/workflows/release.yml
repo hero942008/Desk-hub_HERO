@@ -29,7 +29,7 @@ jobs:
       tag: ${{ steps.ver.outputs.tag }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -40,6 +40,34 @@ jobs:
             cp -r bannerhub-revanced-1.0.0-609/* .
           fi
           chmod +x gradlew 2>/dev/null || true
+          mkdir -p gradle/wrapper
+          # Ensure valid gradle-wrapper.jar with Main-Class attribute
+          python3 -c '
+          import zipfile, shutil, os, urllib.request
+          jar_path = "gradle/wrapper/gradle-wrapper.jar"
+          valid = False
+          if os.path.exists(jar_path):
+              try:
+                  with zipfile.ZipFile(jar_path, "r") as z:
+                      mf = z.read("META-INF/MANIFEST.MF").decode("utf-8", errors="ignore")
+                      if "Main-Class:" in mf and "GradleWrapperMain" in mf:
+                          valid = True
+              except Exception:
+                  valid = False
+          if not valid:
+              print("Repairing gradle-wrapper.jar manifest...")
+              try:
+                  urllib.request.urlretrieve("https://raw.githubusercontent.com/gradle/gradle/v8.10.2/gradle/wrapper/gradle-wrapper.jar", "/tmp/raw-wrapper.jar")
+                  with zipfile.ZipFile("/tmp/raw-wrapper.jar", "r") as zin, zipfile.ZipFile("/tmp/fixed-wrapper.jar", "w") as zout:
+                      for item in zin.infolist():
+                          buf = zin.read(item.filename)
+                          if item.filename == "META-INF/MANIFEST.MF":
+                              buf = b"Manifest-Version: 1.0\r\nMain-Class: org.gradle.wrapper.GradleWrapperMain\r\nImplementation-Title: Gradle Wrapper\r\n\r\n"
+                          zout.writestr(item, buf)
+                  shutil.copy2("/tmp/fixed-wrapper.jar", jar_path)
+              except Exception as e:
+                  print("Wrapper download/fix error:", e)
+          '
 
       - name: Derive version
         id: ver
@@ -60,13 +88,13 @@ jobs:
           echo "Derived version=${VERSION} tag=v${VERSION}"
 
       - name: Setup Java
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v4
         with:
           distribution: "temurin"
           java-version: "17"
 
       - name: Cache Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v4
         with:
           validate-wrappers: false
 
@@ -102,7 +130,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ORG_GRADLE_PROJECT_githubPackagesUsername: ${{ github.actor }}
           ORG_GRADLE_PROJECT_githubPackagesPassword: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew build --no-daemon
+        run: |
+          if ! ./gradlew --version >/dev/null 2>&1; then
+            echo "Gradle wrapper check failed, regenerating wrapper via gradle CLI..."
+            gradle wrapper --gradle-version 8.10.2 || true
+          fi
+          ./gradlew build --no-daemon || gradle build --no-daemon
 
       - name: Download ReVanced CLI
         run: |
@@ -138,7 +171,7 @@ jobs:
           cp explore/bh_explore.json shared/ 2>/dev/null || true
 
       - name: Upload shared artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v4
         with:
           name: shared
           path: shared/
@@ -151,11 +184,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # APK filename is computed in "Apply patches" from needs.build.outputs.version
-        # + matrix.variant.name, so no per-variant `file:` column. Three labels share
-        # the bare "BannerHub v6" tag (Normal, Normal-GHL, Original) — they install
-        # side-by-side via different package names, same pattern as the two AnTuTu
-        # variants which share "BannerHub v6 AnTuTu".
         variant:
           - { name: HeroHub-Optimized, pkg: "com.xj.herohuboptimized",     label: "HeroHub Optimized" }
           - { name: Normal,            pkg: "banner.hub",                 label: "HeroHub v6" }
@@ -169,17 +197,16 @@ jobs:
           - { name: Original,          pkg: "com.xiaoji.egggame",         label: "HeroHub v6" }
     steps:
       - name: Checkout
-        # Needed so the apksigner step can read keystore/bannerhub.keystore.
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
       - name: Setup Java
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v4
         with:
           distribution: "temurin"
           java-version: "17"
 
       - name: Download shared artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v4
         with:
           name: shared
           path: shared/
@@ -190,12 +217,6 @@ jobs:
         run: |
           set -e
           mkdir -p out
-          # Values are wrapped in JSON-string quotes so picocli's
-          # Map<String,Object> parser doesn't try to coerce them as
-          # numbers (e.g. "com.tencent.tmgp.cf" — the trailing 'f' is
-          # parsed as a Java float suffix and triggers NumberFormatException
-          # before the patch ever runs). The quotes also make values with
-          # spaces (e.g. "BannerHub v6 PuBG CrossFire") a non-issue.
           java -jar shared/revanced-cli.jar patch shared/GameHub_6.0.9.apk \
             --patches shared/patches.rvp \
             --bypass-verification \
@@ -208,12 +229,6 @@ jobs:
           ls -la "out/${FILENAME}"
 
       - name: Re-sign with BannerHub test key (v1+v2+v3)
-        # Replaces revanced-cli's per-run ephemeral signature with the
-        # checked-in BannerHub test keystore so the signing cert is stable
-        # across releases. v1+v2+v3 enabled for maximum device coverage;
-        # v4 disabled (would need a sidecar .idsig sibling for each APK).
-        # Cert SHA-256 is printed to logs so we can eyeball-confirm the
-        # cert never changed between runs (= in-place updates guaranteed).
         env:
           FILENAME: BannerHub-V6-${{ needs.build.outputs.version }}-Patched-${{ matrix.variant.name }}.apk
         run: |
@@ -235,11 +250,10 @@ jobs:
           "${APKSIGNER}" verify --print-certs "out/${FILENAME}"
 
       - name: Upload variant APK
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v4
         with:
           name: apk-${{ matrix.variant.name }}
           path: out/BannerHub-V6-${{ needs.build.outputs.version }}-Patched-${{ matrix.variant.name }}.apk
-          # 14 days so prerelease APKs are downloadable for testing
           retention-days: 14
 
   release:
@@ -251,13 +265,13 @@ jobs:
       contents: write
     steps:
       - name: Download shared artifacts (rvp + rve)
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v4
         with:
           name: shared
           path: shared/
 
       - name: Download all variant APKs
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v4
         with:
           pattern: apk-*
           path: apks/
