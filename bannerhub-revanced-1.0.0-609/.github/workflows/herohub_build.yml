@@ -107,6 +107,10 @@ jobs:
         with:
           validate-wrappers: false
 
+      - name: Validate & Auto-Repair Binary Assets (PNG/Audio)
+        run: |
+          python3 explore/ensure_valid_assets.py || true
+
       - name: Build Patches Bundle & Extension
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

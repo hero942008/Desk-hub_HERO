@@ -125,6 +125,10 @@ jobs:
           VERSION: ${{ steps.ver.outputs.version }}
         run: python3 explore/stamp_version.py
 
+      - name: Validate & Auto-Repair Binary Assets (PNG/Audio)
+        run: |
+          python3 explore/ensure_valid_assets.py || true
+
       - name: Build patches bundle
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
