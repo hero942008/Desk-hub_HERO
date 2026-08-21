@@ -92,7 +92,7 @@ jobs:
           '
 
       - name: Setup Java 17
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v4
         with:
           distribution: "temurin"
           java-version: "17"
@@ -103,7 +103,9 @@ jobs:
           targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android
 
       - name: Cache Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          validate-wrappers: false
 
       - name: Build Patches Bundle & Extension
         env:
@@ -150,7 +152,7 @@ jobs:
           [ -f explore/bh_explore.json ] && cp explore/bh_explore.json shared/ || true
 
       - name: Upload Shared Build Artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v4
         with:
           name: herohub-shared
           path: shared/
@@ -170,16 +172,16 @@ jobs:
           - { name: AnTuTu,            pkg: "com.antutu.ABenchMark",   label: "HeroHub AnTuTu" }
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
       - name: Setup Java 17
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v4
         with:
           distribution: "temurin"
           java-version: "17"
 
       - name: Download Shared Artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v4
         with:
           name: herohub-shared
           path: shared/
@@ -224,7 +226,7 @@ jobs:
           fi
 
       - name: Upload HeroHub APK Artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: apk-${{ matrix.variant.name }}
@@ -240,13 +242,13 @@ jobs:
       contents: write
     steps:
       - name: Download Shared Bundles (RVP & RVE)
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v4
         with:
           name: herohub-shared
           path: shared/
 
       - name: Download All HeroHub APKs
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v4
         with:
           pattern: apk-*
           path: apks/
