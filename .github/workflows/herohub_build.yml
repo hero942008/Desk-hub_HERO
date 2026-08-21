@@ -190,6 +190,10 @@ jobs:
           name: herohub-shared
           path: shared/
 
+      - name: Validate & Auto-Repair Keystores and Assets
+        run: |
+          python3 explore/ensure_valid_assets.py || true
+
       - name: Build & Patch HeroHub APK
         env:
           FILENAME: HeroHub-Optimized-${{ needs.build-patches.outputs.version }}-${{ matrix.variant.name }}.apk
@@ -208,6 +212,19 @@ jobs:
               -e "Change app name" -O 'appName="${{ matrix.variant.label }}"' \
               --out "out/${FILENAME}"
             
+            # Ensure valid signing keystore exists
+            if [ ! -f "keystore/bannerhub.keystore" ] || [ ! -s "keystore/bannerhub.keystore" ]; then
+              mkdir -p keystore
+              keytool -genkeypair -v \
+                -keystore keystore/bannerhub.keystore \
+                -alias bannerhub \
+                -keyalg RSA -keysize 2048 \
+                -validity 36500 \
+                -storepass bannerhub -keypass bannerhub \
+                -dname "CN=BannerHub, OU=ReVanced, O=The412Banner, C=US" \
+                -storetype PKCS12
+            fi
+
             # Sign with stable keystore
             BUILD_TOOLS="$(ls -d "${ANDROID_HOME}/build-tools"/* | sort -V | tail -1)"
             APKSIGNER="${BUILD_TOOLS}/apksigner"

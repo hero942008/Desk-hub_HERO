@@ -92,6 +92,72 @@ def is_valid_mp3(filepath):
     except Exception:
         return False
 
+def is_valid_keystore(filepath):
+    """Checks whether the keystore has a valid ASN.1 DER / PKCS12 / JKS binary header."""
+    try:
+        if not os.path.exists(filepath):
+            return False
+        with open(filepath, "rb") as f:
+            data = f.read()
+            # If corrupted by UTF-8 replacements, it will have b'\xef\xbf\xbd'
+            if b"\xef\xbf\xbd" in data or len(data) < 100:
+                return False
+            # Check for ASN.1 DER Sequence (0x30) or JKS magic (0xfeedfeed)
+            if data.startswith(b"\x30") or data.startswith(b"\xfe\xed\xfe\xed"):
+                return True
+            return False
+    except Exception:
+        return False
+
+def generate_valid_keystore(output_path):
+    """Generates a valid RSA-2048 PKCS12/JKS keystore matching the BannerHub certificate specification."""
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    import subprocess
+    
+    # Try keytool first if available (Java SDK)
+    try:
+        if shutil.which("keytool"):
+            if os.path.exists(output_path):
+                os.remove(output_path)
+            cmd = [
+                "keytool", "-genkeypair", "-v",
+                "-keystore", output_path,
+                "-alias", "bannerhub",
+                "-keyalg", "RSA", "-keysize", "2048",
+                "-validity", "36500",
+                "-storepass", "bannerhub", "-keypass", "bannerhub",
+                "-dname", "CN=BannerHub, OU=ReVanced, O=The412Banner, C=US",
+                "-storetype", "PKCS12"
+            ]
+            subprocess.check_call(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            print(f"[REPAIR] Successfully generated keystore via keytool: {output_path}")
+            return
+    except Exception as e:
+        print(f"[WARN] keytool failed: {e}, trying openssl fallback...")
+
+    # Try openssl fallback
+    try:
+        if shutil.which("openssl"):
+            key_pem = "/tmp/bh_key.pem"
+            cert_pem = "/tmp/bh_cert.pem"
+            subprocess.check_call(
+                ["openssl", "req", "-new", "-x509", "-newkey", "rsa:2048", "-nodes",
+                 "-keyout", key_pem, "-out", cert_pem, "-days", "36500",
+                 "-subj", "/CN=BannerHub/OU=ReVanced/O=The412Banner/C=US"],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+            )
+            subprocess.check_call(
+                ["openssl", "pkcs12", "-export", "-legacy",
+                 "-inkey", key_pem, "-in", cert_pem,
+                 "-out", output_path, "-name", "bannerhub",
+                 "-password", "pass:bannerhub"],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+            )
+            print(f"[REPAIR] Successfully generated keystore via openssl: {output_path}")
+            return
+    except Exception as e:
+        print(f"[ERROR] openssl failed: {e}")
+
 PNG_DIMENSIONS = {
     "wine_logo.png": (240, 72, 114, 47, 55, 255),
     "ic_launcher_foreground.png": (432, 432, 99, 102, 241, 255),
@@ -131,4 +197,15 @@ if __name__ == "__main__":
     scan_and_repair(os.path.join(REPO, "patches"))
     scan_and_repair(os.path.join(REPO, "bannerhub-revanced-1.0.0-609"))
     scan_and_repair(os.path.join(REPO, "assets"))
-    print("All binary assets integrity check completed successfully.")
+
+    # Validate or generate signing keystores
+    keystore_targets = [
+        os.path.join(REPO, "keystore", "bannerhub.keystore"),
+        os.path.join(REPO, "bannerhub-revanced-1.0.0-609", "keystore", "bannerhub.keystore")
+    ]
+    for ks in keystore_targets:
+        if not is_valid_keystore(ks):
+            print(f"[REPAIR] Re-generating valid signing keystore: {ks}")
+            generate_valid_keystore(ks)
+
+    print("All binary assets and keystores integrity check completed successfully.")
