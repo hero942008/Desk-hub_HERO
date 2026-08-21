@@ -276,7 +276,7 @@ jobs:
   release:
     name: Create GitHub Release
     needs: [build, patch]
-    if: startsWith(github.ref, 'refs/tags/') || (github.event_name == 'workflow_dispatch' && inputs.stable == true)
+    if: always() && needs.build.result == 'success' && needs.patch.result != 'cancelled'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -305,9 +305,15 @@ jobs:
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ needs.build.outputs.tag }}
           name: BannerHub v6 ${{ needs.build.outputs.version }}
+          make_latest: true
+          draft: false
+          prerelease: false
+          generate_release_notes: false
           # Slim release-notes template. Each stable: refresh the "What's new in ..."
           # section below for the changes since the prior stable (base bumps + new features).
           body: |

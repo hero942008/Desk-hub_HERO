@@ -171,9 +171,15 @@ jobs:
       matrix:
         variant:
           - { name: HeroHub-Optimized, pkg: "com.xj.herohuboptimized", label: "HeroHub Optimized" }
+          - { name: Normal,            pkg: "banner.hub",             label: "HeroHub Normal" }
           - { name: Normal-GHL,        pkg: "gamehub.lite",            label: "HeroHub Lite" }
           - { name: PuBG,              pkg: "com.tencent.ig",          label: "HeroHub PuBG" }
           - { name: AnTuTu,            pkg: "com.antutu.ABenchMark",   label: "HeroHub AnTuTu" }
+          - { name: alt-AnTuTu,        pkg: "com.antutu.benchmark.full", label: "HeroHub alt-AnTuTu" }
+          - { name: PuBG-CrossFire,    pkg: "com.tencent.tmgp.cf",     label: "HeroHub CrossFire" }
+          - { name: Ludashi,           pkg: "com.ludashi.aibench",     label: "HeroHub Ludashi" }
+          - { name: Genshin,           pkg: "com.miHoYo.GenshinImpact", label: "HeroHub Genshin" }
+          - { name: Original,          pkg: "com.xiaoji.egggame",      label: "GameHub" }
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -257,7 +263,7 @@ jobs:
   release:
     name: Publish HeroHub Release
     needs: [build-patches, patch-and-build-apk]
-    if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) || (github.event_name == 'workflow_dispatch' && github.event.inputs.create_release == 'true')
+    if: always() && needs.build-patches.result == 'success' && needs.patch-and-build-apk.result != 'cancelled'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -277,16 +283,22 @@ jobs:
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ needs.build-patches.outputs.tag }}
           name: HeroHub Optimized ${{ needs.build-patches.outputs.version }}
+          make_latest: true
+          draft: false
+          prerelease: false
+          generate_release_notes: false
           body: |
             # 🚀 HeroHub Optimized ${{ needs.build-patches.outputs.version }}
             
             High-performance modification of GameHub 6.0.9 featuring ultra-fast Rust native core, Vulkan 1.3 zero-copy rendering, and optimized CPU scheduling.
             
             ### ⚡ Performance Features
-            - **Package Name:** `com.xj.herohuboptimized`
+            - **Package Name:** `com.xj.herohuboptimized` (plus 9 side-by-side variants)
             - **Primary Renderer:** Direct-to-Display Native Vulkan 1.3
             - **Anti-Stutter:** Persistent VkPipelineCache on storage
             - **Zero-Copy Pipeline:** `AHardwareBuffer` direct frame presentation
@@ -301,3 +313,4 @@ jobs:
             apks/*.apk
             shared/*.rvp
             shared/rve/*.rve
+            shared/bh_explore.json
