@@ -20,6 +20,20 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Auto-detect workspace directory
+        run: |
+          if [ -d "bannerhub-revanced-1.0.0-609" ] && [ -f "bannerhub-revanced-1.0.0-609/gradlew" ]; then
+            echo "Working from bannerhub-revanced-1.0.0-609 directory..."
+            cp -r bannerhub-revanced-1.0.0-609/* .
+          fi
+          chmod +x gradlew 2>/dev/null || true
+          # Verify gradle wrapper jar integrity
+          if [ ! -f "gradle/wrapper/gradle-wrapper.jar" ] || ! unzip -tq gradle/wrapper/gradle-wrapper.jar >/dev/null 2>&1; then
+            echo "Repairing corrupt or missing gradle-wrapper.jar..."
+            mkdir -p gradle/wrapper
+            curl -sSL "https://raw.githubusercontent.com/gradle/gradle/v8.10.2/gradle/wrapper/gradle-wrapper.jar" -o gradle/wrapper/gradle-wrapper.jar
+          fi
+
       - name: Setup Java
         uses: actions/setup-java@v5
         with:
