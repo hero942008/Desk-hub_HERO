@@ -130,8 +130,6 @@ public class BannerExploreActivity extends Activity {
         View versionLine = buildVersionLine();
         if (versionLine != null) column.addView(versionLine);
 
-        if (showUpdateBanner()) column.addView(buildUpdateBanner());
-
         if (rails == null || rails.isEmpty()) {
             column.addView(emptyState());
             return;
@@ -166,7 +164,7 @@ public class BannerExploreActivity extends Activity {
         return back;
     }
 
-    /** Top row: "← Back" chip on the left, a settings ⚙ cog on the right. */
+    /** Top row: "← Back" chip on the left. */
     private View buildTopBar() {
         LinearLayout bar = new LinearLayout(this);
         bar.setOrientation(LinearLayout.HORIZONTAL);
@@ -176,88 +174,17 @@ public class BannerExploreActivity extends Activity {
         bar.setLayoutParams(barLp);
 
         bar.addView(buildBackButton());
-
-        View spacer = new View(this);
-        bar.addView(spacer, new LinearLayout.LayoutParams(0, dp(1), 1f));
-
-        bar.addView(buildSettingsCog());
         return bar;
     }
 
-    /** Small gear chip → opens the update-alert settings dialog. */
-    private View buildSettingsCog() {
-        TextView cog = new TextView(this);
-        cog.setText("⚙"); // ⚙
-        cog.setTextColor(TEXT);
-        cog.setTextSize(16);
-        cog.setTypeface(Typeface.DEFAULT_BOLD);
-        cog.setGravity(Gravity.CENTER);
-        cog.setPadding(dp(13), dp(8), dp(13), dp(8));
-        GradientDrawable bg = new GradientDrawable();
-        bg.setColor(CARD_BG);
-        bg.setCornerRadius(dp(20));
-        bg.setStroke(dp(1), CARD_STROKE);
-        cog.setBackground(bg);
-        cog.setContentDescription("Update settings");
-        cog.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) { openUpdateSettings(); }
-        });
-        return cog;
-    }
-
-    /** Settings dialog: toggle update notifications + show installed/latest. */
-    private void openUpdateSettings() {
-        final android.content.SharedPreferences p = getSharedPreferences(PREFS, MODE_PRIVATE);
-        final boolean disabled = p.getBoolean(KEY_UPDATE_ALERT_DISABLED, false);
-
-        LinearLayout box = new LinearLayout(this);
-        box.setOrientation(LinearLayout.VERTICAL);
-        int pad = dp(22);
-        box.setPadding(pad, dp(8), pad, 0);
-
-        final android.widget.CheckBox cb = new android.widget.CheckBox(this);
-        cb.setText("Notify me when an update is available");
-        cb.setTextColor(TEXT);
-        cb.setChecked(!disabled); // checked = notifications ON
-        box.addView(cb);
-
-        TextView info = new TextView(this);
-        info.setText(versionSummary());
-        info.setTextColor(TEXT_DIM);
-        info.setTextSize(12);
-        info.setPadding(dp(2), dp(10), 0, dp(4));
-        box.addView(info);
-
-        new android.app.AlertDialog.Builder(this)
-            .setTitle("Updates")
-            .setView(box)
-            .setPositiveButton("Done", new android.content.DialogInterface.OnClickListener() {
-                @Override public void onClick(android.content.DialogInterface d, int which) {
-                    p.edit().putBoolean(KEY_UPDATE_ALERT_DISABLED, !cb.isChecked()).apply();
-                    if (currentRails != null) renderRails(currentRails); // reflect toggle
-                }
-            })
-            .show();
-    }
-
-    /** "Version 1.6.0-604 · up to date" / "· latest 1.7.0-604" — null if the
-     *  installed version asset isn't present (e.g. the preview harness). */
+    /** "Version 1.0.5" */
     private View buildVersionLine() {
         String installed = BhExploreManifest.installedVersion(this);
-        if (installed == null) return null;
-
-        boolean update = BhExploreManifest.updateAvailable(this);
-        String latest = BhExploreManifest.latestVersion(this);
+        if (installed == null) installed = "1.0.5";
 
         TextView tv = new TextView(this);
-        String text = "Version " + installed;
-        if (update && latest != null) {
-            text += "  ·  latest " + latest;
-        } else if (BhExploreManifest.latestBuild(this) > 0) {
-            text += "  ·  up to date";
-        }
-        tv.setText(text);
-        tv.setTextColor(update ? UPDATE_ACCENT : TEXT_DIM);
+        tv.setText("Version " + installed);
+        tv.setTextColor(TEXT_DIM);
         tv.setTextSize(12);
         tv.setPadding(dp(4), 0, 0, dp(14));
         return tv;

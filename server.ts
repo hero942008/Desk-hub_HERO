@@ -42,10 +42,10 @@ async function startServer() {
 
     res.json({
       exists: true,
-      name: "HeroHub Optimized",
-      version: "v1.0.0-609-opt",
-      sourceUrl: "https://github.com/herohuboptimized/herohub-optimized",
-      targetApp: "HeroHub Optimized (com.xj.herohuboptimized)",
+      name: "DeskHub emulator",
+      version: "v1.0.5",
+      sourceUrl: "https://github.com/hero942008/Banerhubhero",
+      targetApp: "DeskHub emulator (com.xj.herohuboptimized)",
       totalFiles: filesCount,
       projectPath: PROJECT_DIR,
       status: "ready"

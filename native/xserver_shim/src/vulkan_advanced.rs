@@ -1,5 +1,5 @@
-//! Vulkan Advanced Acceleration: Timeline Semaphores, Zero-Copy AHardwareBuffer,
-//! Persistent Pipeline Caching (Anti-Stutter), and FidelityFX CAS/FSR Upscaling.
+//! Vulkan 1.4 Advanced Acceleration: Timeline Semaphores, Zero-Copy AHardwareBuffer,
+//! Persistent Pipeline Caching (Anti-Stutter), and FidelityFX CAS/FSR Upscaling with Turnip Tuning.
 
 use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
@@ -27,7 +27,7 @@ impl Default for UpscalerState {
         Self {
             mode: FSR_MODE_NATIVE,
             render_scale: 1.0,
-            sharpness: 0.8,
+            sharpness: 0.85,
             enabled: false,
         }
     }
@@ -39,6 +39,8 @@ pub struct AdvancedVulkanEngine {
     timeline_value: AtomicU64,
     zero_copy_enabled: AtomicBool,
     direct_to_display: AtomicBool,
+    turnip_lrz_active: AtomicBool,
+    gpu_offload_active: AtomicBool,
     upscaler: RwLock<UpscalerState>,
 }
 
@@ -50,6 +52,8 @@ impl AdvancedVulkanEngine {
             timeline_value: AtomicU64::new(0),
             zero_copy_enabled: AtomicBool::new(true),
             direct_to_display: AtomicBool::new(true),
+            turnip_lrz_active: AtomicBool::new(true),
+            gpu_offload_active: AtomicBool::new(true),
             upscaler: RwLock::new(UpscalerState::default()),
         }
     }
@@ -103,12 +107,22 @@ impl AdvancedVulkanEngine {
     /// Advances timeline semaphore value for low-latency synchronization without blocking CPU threads.
     #[inline(always)]
     pub fn advance_timeline(&self) -> u64 {
-        self.timeline_value.fetch_add(1, Ordering::SeqCst) + 1
+        self.timeline_value.fetch_add(1, Ordering::Release) + 1
     }
 
     #[inline(always)]
     pub fn get_current_timeline(&self) -> u64 {
-        self.timeline_value.load(Ordering::Relaxed)
+        self.timeline_value.load(Ordering::Acquire)
+    }
+
+    #[inline(always)]
+    pub fn is_gpu_offload_active(&self) -> bool {
+        self.gpu_offload_active.load(Ordering::Relaxed)
+    }
+
+    #[inline(always)]
+    pub fn is_turnip_lrz_active(&self) -> bool {
+        self.turnip_lrz_active.load(Ordering::Relaxed)
     }
 
     pub fn set_upscaler_config(&self, mode: u32, sharpness: f32, render_scale: f32) {
@@ -133,10 +147,12 @@ impl AdvancedVulkanEngine {
         self.upscaler.read().map(|c| *c).unwrap_or_default()
     }
 
+    #[inline(always)]
     pub fn set_zero_copy(&self, enabled: bool) {
         self.zero_copy_enabled.store(enabled, Ordering::Release);
     }
 
+    #[inline(always)]
     pub fn set_direct_display(&self, enabled: bool) {
         self.direct_to_display.store(enabled, Ordering::Release);
     }
@@ -146,3 +162,4 @@ impl AdvancedVulkanEngine {
         self.zero_copy_enabled.load(Ordering::Relaxed)
     }
 }
+

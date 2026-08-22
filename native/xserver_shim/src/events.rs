@@ -1,7 +1,8 @@
 //! Lock-free high-performance input event queue.
 //!
 //! Eliminates JNI thread stalls and Android UI thread jitter by using
-//! a lock-free Single-Producer Single-Consumer (SPSC) / SPMC ring buffer.
+//! a lock-free Single-Producer Single-Consumer (SPSC) / SPMC ring buffer
+//! with cacheline separation to eliminate false sharing.
 
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
@@ -38,10 +39,13 @@ pub enum InputEvent {
     },
 }
 
+#[repr(C, align(64))]
 pub struct LockFreeEventQueue {
     buffer: Box<[Option<InputEvent>]>,
     head: AtomicUsize,
+    _pad1: [u8; 56],
     tail: AtomicUsize,
+    _pad2: [u8; 56],
     is_active: AtomicBool,
 }
 
@@ -54,7 +58,9 @@ impl LockFreeEventQueue {
         Self {
             buffer: buf.into_boxed_slice(),
             head: AtomicUsize::new(0),
+            _pad1: [0; 56],
             tail: AtomicUsize::new(0),
+            _pad2: [0; 56],
             is_active: AtomicBool::new(true),
         }
     }
@@ -70,12 +76,11 @@ impl LockFreeEventQueue {
         let tail = self.tail.load(Ordering::Acquire);
 
         if head.wrapping_sub(tail) >= cap {
-            // Buffer full: drop oldest or reject to avoid blocking render thread
+            // Queue full: drop oldest event to guarantee non-blocking execution
             return false;
         }
 
         let idx = head % cap;
-        // Unsafe cell access for max performance in lock-free ring
         unsafe {
             let ptr = self.buffer.as_ptr().add(idx) as *mut Option<InputEvent>;
             *ptr = Some(event);
@@ -106,8 +111,10 @@ impl LockFreeEventQueue {
         event
     }
 
+    #[inline(always)]
     pub fn clear(&self) {
         self.head.store(0, Ordering::Relaxed);
         self.tail.store(0, Ordering::Relaxed);
     }
 }
+

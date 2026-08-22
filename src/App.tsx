@@ -287,20 +287,27 @@ export default function App() {
       {/* Top Navigation */}
       <header className="border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur sticky top-0 z-30 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 via-red-500 to-indigo-600 flex items-center justify-center text-white shadow-md">
-            <Zap className="w-5 h-5" />
+          <div className="w-11 h-11 rounded-xl overflow-hidden shadow-md flex items-center justify-center bg-slate-900 border border-indigo-500/30">
+            <img
+              src="/assets/deskhub-logo.png"
+              alt="DeskHub Logo"
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h1 className="font-bold text-base md:text-lg tracking-tight text-slate-900 dark:text-white">
-                HeroHub Optimized (Rust + Vulkan Core)
+                DeskHub emulator
               </h1>
-              <span className="bg-amber-100 text-amber-900 dark:bg-amber-900/50 dark:text-amber-300 text-xs font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
-                <Zap className="w-3 h-3" /> com.xj.herohuboptimized
+              <span className="bg-indigo-100 text-indigo-900 dark:bg-indigo-900/50 dark:text-indigo-300 text-xs font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
+                <Zap className="w-3 h-3" /> v1.0.5
               </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              HeroHub Optimized & GitHub Actions CI/CD Automated APK Build Pipeline
+              DeskHub emulator & GitHub Actions CI/CD Automated APK Build Pipeline
             </p>
           </div>
         </div>
@@ -316,7 +323,7 @@ export default function App() {
           </button>
           <a
             id="btn-repo-github"
-            href="https://github.com/The412Banner/bannerhub-revanced/tree/v1.0.0-609"
+            href="https://github.com/hero942008/Banerhubhero"
             target="_blank"
             rel="noreferrer"
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 hover:opacity-90 rounded-lg transition-opacity"
@@ -328,15 +335,15 @@ export default function App() {
       </header>
 
       {/* Main Status Notification Banner */}
-      <div className="bg-gradient-to-r from-amber-500/10 via-emerald-500/10 to-blue-500/10 border-b border-amber-500/20 px-4 py-2.5 text-slate-800 dark:text-slate-200 text-sm flex items-center justify-between">
+      <div className="bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-blue-500/10 border-b border-indigo-500/20 px-4 py-2.5 text-slate-800 dark:text-slate-200 text-sm flex items-center justify-between">
         <div className="flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
           <span className="font-medium text-xs md:text-sm">
-            تمت إعادة بناء محرك الرندر الأصلي بلغة <strong className="text-amber-600 dark:text-amber-400">Rust</strong> وتعيين <strong className="text-blue-600 dark:text-blue-400">Vulkan 1.3</strong> كواجهة أساسية فائقة الأداء مع نظام قراءة SIMD ونظام طوابير Lock-Free!
+            تم ضبط هوية <strong className="text-indigo-600 dark:text-indigo-400">DeskHub emulator</strong> بإصدار <strong className="text-purple-600 dark:text-purple-400">v1.0.5</strong> مع محرك <strong className="text-blue-600 dark:text-blue-400">Vulkan 1.3</strong> وإزالة فحص التحديثات المزعج!
           </span>
         </div>
-        <span className="text-xs bg-amber-600 text-white font-mono px-2.5 py-0.5 rounded-full flex items-center gap-1">
-          <Zap className="w-3 h-3" /> Rust Core Ready
+        <span className="text-xs bg-indigo-600 text-white font-mono px-2.5 py-0.5 rounded-full flex items-center gap-1">
+          <Zap className="w-3 h-3" /> v1.0.5 Ready
         </span>
       </div>
 
@@ -547,7 +554,7 @@ export default function App() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-sm">اسم الحزمة والمشروع</h3>
-                    <p className="text-xs text-slate-500">HeroHub Optimized</p>
+                    <p className="text-xs text-slate-500">DeskHub emulator</p>
                   </div>
                 </div>
                 <p className="text-xs text-slate-600 dark:text-slate-400">
@@ -658,7 +665,7 @@ export default function App() {
           <div className="space-y-6 bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
             <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <Cpu className="w-5 h-5 text-indigo-500" />
-              تفاصيل هيكلية الباتشات والامتدادات المعدلة (HeroHub Optimized)
+              تفاصيل هيكلية الباتشات والامتدادات المعدلة (DeskHub emulator)
             </h2>
 
             <div className="space-y-4 text-sm">
@@ -668,7 +675,7 @@ export default function App() {
                   1. الباتشات ومحرك الحقن (<code className="font-mono text-xs">/patches</code>)
                 </h3>
                 <p className="text-xs text-slate-600 dark:text-slate-400 mb-2">
-                  تم ضبط تغيير اسم الحزمة إلى <code className="text-amber-600 dark:text-amber-400 font-bold">com.xj.herohuboptimized</code> واسم التطبيق إلى <code className="text-blue-600 dark:text-blue-400 font-bold">HeroHub Optimized</code>.
+                  تم ضبط تغيير اسم الحزمة إلى <code className="text-indigo-600 dark:text-indigo-400 font-bold">com.xj.herohuboptimized</code> واسم التطبيق إلى <code className="text-blue-600 dark:text-blue-400 font-bold">DeskHub emulator</code>.
                 </p>
               </div>
 

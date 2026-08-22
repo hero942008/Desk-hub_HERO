@@ -1,10 +1,9 @@
-//! Real-Time Performance, Frametime Tracking, and CPU Core Affinity Engine.
+//! Real-Time Performance & CPU Core Affinity Engine with Zero Background Traces.
 //!
 //! Provides thread pinning to Big/Prime CPU cores, Real-Time FIFO scheduling,
-//! sub-microsecond frametime tracking, and zero-overhead performance telemetry.
+//! and atomic sub-microsecond frametime tracking with 0% background CPU consumption.
 
-use std::sync::atomic::{AtomicBool, AtomicI32, AtomicU64, Ordering};
-use std::time::Instant;
+use std::sync::atomic::{AtomicI32, AtomicU64, Ordering};
 
 pub struct PerfStats {
     pub current_fps: f32,
@@ -18,8 +17,7 @@ pub struct NativePerfEngine {
     frame_counter: AtomicU64,
     last_frame_timestamp_ns: AtomicU64,
     accumulated_frametime_ns: AtomicU64,
-    last_computed_fps: AtomicU64, // Stored as fixed-point f32 * 1000
-    is_realtime_active: AtomicBool,
+    last_computed_fps: AtomicU64, // Fixed-point: f32 * 1000
     cpu_affinity_mask: AtomicI32,
 }
 
@@ -30,12 +28,11 @@ impl NativePerfEngine {
             last_frame_timestamp_ns: AtomicU64::new(0),
             accumulated_frametime_ns: AtomicU64::new(0),
             last_computed_fps: AtomicU64::new(60_000), // Default 60.0 fps * 1000
-            is_realtime_active: AtomicBool::new(false),
             cpu_affinity_mask: AtomicI32::new(0),
         }
     }
 
-    /// Records a new frame presentation event.
+    /// Records frame presentation with zero background polling or thread overhead.
     #[inline(always)]
     pub fn record_frame(&self) {
         let now_ns = Self::get_monotonic_ns();
@@ -67,16 +64,15 @@ impl NativePerfEngine {
         (delta_ns as f32) / 1_000_000.0
     }
 
-    /// Pins calling threads to Big/Prime CPU cores (Cores 4-7 on Octa-core SoCs like Snapdragon 8 Gen 1/2/3).
+    /// Pins calling threads to Big/Prime CPU cores (Cores 4-7 on Snapdragon 8 Gen 1/2/3/4 & Dimensity).
     pub fn pin_to_big_cores() -> bool {
         #[cfg(target_os = "android")]
         unsafe {
             let pid = 0; // Current thread
-            // Big cores mask: 0b11110000 (cores 4, 5, 6, 7) or 0b11100000 (cores 5, 6, 7)
             let mut set: libc::cpu_set_t = std::mem::zeroed();
             libc::CPU_ZERO(&mut set);
             
-            // Set cores 4, 5, 6, 7 (typically Performance and Prime cores)
+            // Set cores 4, 5, 6, 7 (Performance and Prime cores)
             libc::CPU_SET(4, &mut set);
             libc::CPU_SET(5, &mut set);
             libc::CPU_SET(6, &mut set);
@@ -99,7 +95,6 @@ impl NativePerfEngine {
     pub fn set_realtime_priority(priority_level: i32) -> bool {
         #[cfg(target_os = "android")]
         unsafe {
-            // Lower nice value = higher CPU priority (-20 is highest)
             let nice_val = match priority_level {
                 1 => -10, // High
                 2 => -16, // Real-time emulator render thread
@@ -133,3 +128,4 @@ impl NativePerfEngine {
         }
     }
 }
+

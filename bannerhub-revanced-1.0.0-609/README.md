@@ -30,7 +30,7 @@
 
 ---
 
-> ## ⚠️ Important — please read before installing
+> ## ⚠️ Important  please read before installing
 >
 > **BannerHub v6 does NOT replace BannerHub 3.7.x or BannerHub Lite — they are SEPARATE projects.**
 >

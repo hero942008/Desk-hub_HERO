@@ -1,4 +1,4 @@
-name: Build & Release HeroHub Optimized APK
+name: Build & Release DeskHub Emulator APK
 
 on:
   push:
@@ -10,9 +10,9 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version string for APK filenames (e.g. "1.0.0-609" or "1.0.0-609-opt")'
+        description: 'Version string for APK filenames (e.g. "1.0.5" or "1.0.5-609")'
         required: false
-        default: "1.0.0-609"
+        default: "1.0.5"
       create_release:
         description: "Create a GitHub Release with APK assets"
         type: boolean
@@ -44,16 +44,17 @@ jobs:
           set -e
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.version }}" ]; then
             RAW="${{ github.event.inputs.version }}"
-          elif [[ "${GITHUB_REF_NAME}" == v* ]] || [[ "${GITHUB_REF_NAME}" == HeroHub-* ]]; then
+          elif [[ "${GITHUB_REF_NAME}" == v* ]] || [[ "${GITHUB_REF_NAME}" == DeskHub-* ]] || [[ "${GITHUB_REF_NAME}" == HeroHub-* ]]; then
             RAW="${GITHUB_REF_NAME#v}"
+            RAW="${RAW#DeskHub-}"
             RAW="${RAW#HeroHub-}"
           else
-            RAW="1.0.0-609-opt"
+            RAW="1.0.5"
           fi
           VERSION="${RAW#v}"
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "tag=v${VERSION}" >> "$GITHUB_OUTPUT"
-          echo "Building HeroHub Optimized version=${VERSION}"
+          echo "Building DeskHub emulator version=${VERSION}"
 
       - name: Auto-detect workspace directory
         run: |
@@ -170,15 +171,15 @@ jobs:
       fail-fast: false
       matrix:
         variant:
-          - { name: HeroHub-Optimized, pkg: "com.xj.herohuboptimized", label: "HeroHub Optimized" }
-          - { name: Normal,            pkg: "banner.hub",             label: "HeroHub Normal" }
-          - { name: Normal-GHL,        pkg: "gamehub.lite",            label: "HeroHub Lite" }
-          - { name: PuBG,              pkg: "com.tencent.ig",          label: "HeroHub PuBG" }
-          - { name: AnTuTu,            pkg: "com.antutu.ABenchMark",   label: "HeroHub AnTuTu" }
-          - { name: alt-AnTuTu,        pkg: "com.antutu.benchmark.full", label: "HeroHub alt-AnTuTu" }
-          - { name: PuBG-CrossFire,    pkg: "com.tencent.tmgp.cf",     label: "HeroHub CrossFire" }
-          - { name: Ludashi,           pkg: "com.ludashi.aibench",     label: "HeroHub Ludashi" }
-          - { name: Genshin,           pkg: "com.miHoYo.GenshinImpact", label: "HeroHub Genshin" }
+          - { name: DeskHub-Optimized, pkg: "com.xj.herohuboptimized", label: "DeskHub emulator" }
+          - { name: Normal,            pkg: "banner.hub",             label: "DeskHub Normal" }
+          - { name: Normal-GHL,        pkg: "gamehub.lite",            label: "DeskHub Lite" }
+          - { name: PuBG,              pkg: "com.tencent.ig",          label: "DeskHub PuBG" }
+          - { name: AnTuTu,            pkg: "com.antutu.ABenchMark",   label: "DeskHub AnTuTu" }
+          - { name: alt-AnTuTu,        pkg: "com.antutu.benchmark.full", label: "DeskHub alt-AnTuTu" }
+          - { name: PuBG-CrossFire,    pkg: "com.tencent.tmgp.cf",     label: "DeskHub CrossFire" }
+          - { name: Ludashi,           pkg: "com.ludashi.aibench",     label: "DeskHub Ludashi" }
+          - { name: Genshin,           pkg: "com.miHoYo.GenshinImpact", label: "DeskHub Genshin" }
           - { name: Original,          pkg: "com.xiaoji.egggame",      label: "GameHub" }
     steps:
       - name: Checkout Repository
@@ -200,14 +201,14 @@ jobs:
         run: |
           python3 explore/ensure_valid_assets.py || true
 
-      - name: Build & Patch HeroHub APK
+      - name: Build & Patch DeskHub APK
         env:
-          FILENAME: HeroHub-Optimized-${{ needs.build-patches.outputs.version }}-${{ matrix.variant.name }}.apk
+          FILENAME: DeskHub-emulator-${{ needs.build-patches.outputs.version }}-${{ matrix.variant.name }}.apk
         run: |
           set -e
           mkdir -p out
           if [ -f "shared/GameHub_6.0.9.apk" ]; then
-            echo "Applying HeroHub high-performance patches with package ${{ matrix.variant.pkg }}..."
+            echo "Applying DeskHub high-performance patches with package ${{ matrix.variant.pkg }}..."
             java -jar shared/revanced-cli.jar patch shared/GameHub_6.0.9.apk \
               --patches shared/patches.rvp \
               --bypass-verification \
@@ -227,7 +228,7 @@ jobs:
                 -keyalg RSA -keysize 2048 \
                 -validity 36500 \
                 -storepass bannerhub -keypass bannerhub \
-                -dname "CN=BannerHub, OU=ReVanced, O=The412Banner, C=US" \
+                -dname "CN=DeskHub, OU=ReVanced, O=DeskHub, C=US" \
                 -storetype PKCS12
             fi
 
@@ -252,7 +253,7 @@ jobs:
             echo "Notice: Base GameHub APK not present in workflow runners without mirror; patches .rvp and build bundles generated successfully."
           fi
 
-      - name: Upload HeroHub APK Artifact
+      - name: Upload DeskHub APK Artifact
         uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -261,7 +262,7 @@ jobs:
           retention-days: 30
 
   release:
-    name: Publish HeroHub Release
+    name: Publish DeskHub Release
     needs: [build-patches, patch-and-build-apk]
     if: always() && needs.build-patches.result == 'success' && needs.patch-and-build-apk.result != 'cancelled'
     runs-on: ubuntu-latest
@@ -274,7 +275,7 @@ jobs:
           name: herohub-shared
           path: shared/
 
-      - name: Download All HeroHub APKs
+      - name: Download All DeskHub APKs
         uses: actions/download-artifact@v4
         with:
           pattern: apk-*
@@ -287,13 +288,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ needs.build-patches.outputs.tag }}
-          name: HeroHub Optimized ${{ needs.build-patches.outputs.version }}
+          name: DeskHub emulator ${{ needs.build-patches.outputs.version }}
           make_latest: true
           draft: false
           prerelease: false
           generate_release_notes: false
           body: |
-            # 🚀 HeroHub Optimized ${{ needs.build-patches.outputs.version }}
+            # 🚀 DeskHub emulator ${{ needs.build-patches.outputs.version }}
             
             High-performance modification of GameHub 6.0.9 featuring ultra-fast Rust native core, Vulkan 1.3 zero-copy rendering, and optimized CPU scheduling.
             

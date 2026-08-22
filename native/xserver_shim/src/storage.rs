@@ -1,8 +1,9 @@
 //! Ultra-Fast Memory-Mapped (mmap) Configuration & Settings Storage Engine.
 //!
 //! Provides lock-free, zero-copy reads/writes for emulator settings, bypassing Android
-//! SharedPreferences XML serialization overhead and GC churn.
+//! SharedPreferences XML serialization overhead and GC churn with O(1) hash indexed lookups.
 
+use std::collections::HashMap;
 use std::fs::{File, OpenOptions};
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -39,19 +40,12 @@ impl ConfigEntry {
     }
 }
 
-#[repr(C)]
-pub struct MmapHeader {
-    pub magic: u32,
-    pub version: u32,
-    pub count: u32,
-    pub checksum: u32,
-}
-
 pub struct NativeMmapStorage {
     storage_dir: RwLock<PathBuf>,
     is_initialized: AtomicBool,
     entry_count: AtomicU32,
     entries: RwLock<Vec<ConfigEntry>>,
+    index_map: RwLock<HashMap<String, usize>>,
 }
 
 impl NativeMmapStorage {
@@ -61,6 +55,7 @@ impl NativeMmapStorage {
             is_initialized: AtomicBool::new(false),
             entry_count: AtomicU32::new(0),
             entries: RwLock::new(Vec::with_capacity(MAX_ENTRIES)),
+            index_map: RwLock::new(HashMap::with_capacity(MAX_ENTRIES)),
         }
     }
 
@@ -71,21 +66,22 @@ impl NativeMmapStorage {
         true
     }
 
+    /// O(1) Fast Hash-Indexed write
     pub fn set_fast(&self, key: &str, val: &str) -> bool {
         if key.len() > MAX_KEY_LEN || val.len() > MAX_VAL_LEN {
             return false;
         }
 
+        let mut map = self.index_map.write().unwrap();
         let mut entries = self.entries.write().unwrap();
-        for entry in entries.iter_mut() {
-            if entry.is_set == 1 {
-                let existing_key = &entry.key[..entry.key_len as usize];
-                if existing_key == key.as_bytes() {
-                    let val_bytes = val.as_bytes();
-                    entry.value[..val_bytes.len()].copy_from_slice(val_bytes);
-                    entry.val_len = val_bytes.len() as u16;
-                    return true;
-                }
+
+        if let Some(&idx) = map.get(key) {
+            if idx < entries.len() {
+                let entry = &mut entries[idx];
+                let val_bytes = val.as_bytes();
+                entry.value[..val_bytes.len()].copy_from_slice(val_bytes);
+                entry.val_len = val_bytes.len() as u16;
+                return true;
             }
         }
 
@@ -100,7 +96,9 @@ impl NativeMmapStorage {
             new_entry.val_len = val_bytes.len() as u16;
             new_entry.is_set = 1;
 
+            let idx = entries.len();
             entries.push(new_entry);
+            map.insert(key.to_string(), idx);
             self.entry_count.fetch_add(1, Ordering::Relaxed);
             return true;
         }
@@ -108,17 +106,18 @@ impl NativeMmapStorage {
         false
     }
 
+    /// O(1) Fast Hash-Indexed read
     pub fn get_fast(&self, key: &str) -> Option<String> {
-        let entries = self.entries.read().unwrap();
-        for entry in entries.iter() {
-            if entry.is_set == 1 {
-                let existing_key = &entry.key[..entry.key_len as usize];
-                if existing_key == key.as_bytes() {
-                    let val_bytes = &entry.value[..entry.val_len as usize];
-                    return String::from_utf8(val_bytes.to_vec()).ok();
-                }
+        let map = self.index_map.read().unwrap();
+        if let Some(&idx) = map.get(key) {
+            let entries = self.entries.read().unwrap();
+            if idx < entries.len() {
+                let entry = &entries[idx];
+                let val_bytes = &entry.value[..entry.val_len as usize];
+                return String::from_utf8(val_bytes.to_vec()).ok();
             }
         }
         None
     }
 }
+

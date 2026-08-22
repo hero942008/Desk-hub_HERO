@@ -1,6 +1,6 @@
 {
-  "name": "HeroHub Optimized",
-  "description": "HeroHub Optimized (herohuboptimized) - High-performance GameHub Android ReVanced modification with Rust Vulkan 1.3 native core and automated GitHub Actions CI/CD APK build pipelines.",
+  "name": "DeskHub emulator",
+  "description": "DeskHub emulator - High-performance GameHub/DeskHub Android ReVanced modification with Rust Vulkan 1.3 native core, zero-copy pipeline, and automated GitHub Actions CI/CD APK build pipelines.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
