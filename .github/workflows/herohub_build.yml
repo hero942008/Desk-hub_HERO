@@ -227,8 +227,17 @@ jobs:
               -e "Change app name" -O 'appName="${{ matrix.variant.label }}"' \
               --out "out/${FILENAME}"
             
-            # Ensure valid signing keystore exists
-            if [ ! -f "keystore/bannerhub.keystore" ] || [ ! -s "keystore/bannerhub.keystore" ]; then
+            # Verify keystore validity and generate if invalid or missing
+            VALID_KS=false
+            if [ -f "keystore/bannerhub.keystore" ]; then
+              if keytool -list -keystore keystore/bannerhub.keystore -storepass bannerhub >/dev/null 2>&1; then
+                VALID_KS=true
+              fi
+            fi
+
+            if [ "$VALID_KS" = "false" ]; then
+              echo "Keystore missing or invalid; generating fresh RSA-2048 PKCS12 keystore..."
+              rm -f keystore/bannerhub.keystore
               mkdir -p keystore
               keytool -genkeypair -v \
                 -keystore keystore/bannerhub.keystore \
@@ -307,6 +316,17 @@ jobs:
           [ -d apks ] && cp apks/*.apk release_assets/ 2>/dev/null || true
           echo "Release assets staged:"
           ls -lh release_assets/ || true
+
+      - name: Ensure Git Tag is Pushed
+        env:
+          TAG: ${{ needs.build-patches.outputs.tag }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Pushing git tag $TAG..."
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -f "$TAG" "${{ github.sha }}" || true
+          git push origin "$TAG" --force 2>/dev/null || true
 
       - name: Publish GitHub Release (Primary)
         id: create-release
