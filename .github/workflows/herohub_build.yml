@@ -403,7 +403,7 @@ jobs:
                   "filename": filename,
                   "size_mb": f"{filesize_mb:.2f}",
                   "sha256": sha256,
-                  "vt_url": f"https://www.virustotal.com/gui/file/{sha256}",
+                  "vt_url": f"https://www.virustotal.com/gui/search/{sha256}",
                   "status": "Calculated (SHA-256 Verified)",
                   "malicious": 0, "suspicious": 0, "harmless": 0, "undetected": 0, "total_engines": 0
               }
@@ -421,6 +421,7 @@ jobs:
                       report["suspicious"] = stats.get("suspicious", 0)
                       report["total_engines"] = sum(stats.values())
                       report["status"] = "Verified Clean" if report["malicious"] == 0 else "Flagged"
+                      report["vt_url"] = f"https://www.virustotal.com/gui/file/{sha256}"
                       print(f"VT Hash Found: {report['malicious']}/{report['total_engines']} detections")
                       results.append(report)
                       continue
@@ -437,7 +438,7 @@ jobs:
                       upload_url = url_res.json().get("data", upload_url)
 
                   with open(filepath, "rb") as uf:
-                      post_res = requests.post(upload_url, headers=headers, files={"file": (filename, uf)}, timeout=120)
+                      post_res = requests.post(upload_url, headers=headers, files={"file": (filename, uf)}, timeout=180)
                       if post_res.status_code in [200, 201]:
                           analysis_id = post_res.json().get("data", {}).get("id")
               except Exception as e:
@@ -457,6 +458,7 @@ jobs:
                                   report["suspicious"] = stats.get("suspicious", 0)
                                   report["total_engines"] = sum(stats.values())
                                   report["status"] = "Verified Clean" if report["malicious"] == 0 else "Flagged"
+                                  report["vt_url"] = f"https://www.virustotal.com/gui/file/{sha256}"
                                   break
                       except Exception as e:
                           print(f"Polling error: {e}")

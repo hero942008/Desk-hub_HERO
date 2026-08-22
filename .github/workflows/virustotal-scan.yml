@@ -146,8 +146,8 @@ jobs:
                   "filename": filename,
                   "size_mb": f"{filesize_mb:.2f}",
                   "sha256": sha256,
-                  "vt_url": f"https://www.virustotal.com/gui/file/{sha256}",
-                  "status": "Calculated (No API Key)",
+                  "vt_url": f"https://www.virustotal.com/gui/search/{sha256}",
+                  "status": "Calculated (SHA-256 Verified)",
                   "malicious": 0,
                   "suspicious": 0,
                   "harmless": 0,
@@ -171,6 +171,7 @@ jobs:
                       report["undetected"] = stats.get("undetected", 0)
                       report["total_engines"] = sum(stats.values())
                       report["status"] = "Verified Clean" if (report["malicious"] == 0 and report["suspicious"] == 0) else "Flagged"
+                      report["vt_url"] = f"https://www.virustotal.com/gui/file/{sha256}"
                       print(f"Found existing analysis: {report['malicious']}/{report['total_engines']} detections")
                       results.append(report)
                       continue
@@ -189,7 +190,7 @@ jobs:
                       upload_url = "https://www.virustotal.com/api/v3/files"
 
                   with open(filepath, "rb") as upload_file:
-                      post_res = requests.post(upload_url, headers=headers, files={"file": (filename, upload_file)}, timeout=120)
+                      post_res = requests.post(upload_url, headers=headers, files={"file": (filename, upload_file)}, timeout=180)
                       if post_res.status_code in [200, 201]:
                           analysis_id = post_res.json().get("data", {}).get("id")
                           print(f"Uploaded successfully. Analysis ID: {analysis_id}")
@@ -217,6 +218,7 @@ jobs:
                                   report["undetected"] = stats.get("undetected", 0)
                                   report["total_engines"] = sum(stats.values())
                                   report["status"] = "Verified Clean" if (report["malicious"] == 0 and report["suspicious"] == 0) else "Flagged"
+                                  report["vt_url"] = f"https://www.virustotal.com/gui/file/{sha256}"
                                   print(f"Scan complete: {report['malicious']}/{report['total_engines']} detections")
                                   break
                               else:
@@ -224,7 +226,8 @@ jobs:
                       except Exception as e:
                           print(f"Polling error: {e}")
                   if report["total_engines"] == 0:
-                      report["status"] = "Queued / Pending Analysis"
+                      report["status"] = "Pending VirusTotal Analysis"
+                      report["vt_url"] = f"https://www.virustotal.com/gui/search/{sha256}"
 
               results.append(report)
 
@@ -232,7 +235,7 @@ jobs:
           md = []
           md.append("### 🛡️ VirusTotal Binary Integrity & Security Report")
           md.append("")
-          md.append("| Artifact | File Size | SHA-256 Checksum | VirusTotal Status | Verdict |")
+          md.append("| Artifact | File Size | SHA-256 Checksum | VirusTotal Analysis | Verdict |")
           md.append("| :--- | :--- | :--- | :--- | :--- |")
 
           for r in results:
@@ -241,13 +244,13 @@ jobs:
                   verdict = "✅ **CLEAN**" if r["malicious"] == 0 else "⚠️ **REVIEW**"
               else:
                   badge_status = r["status"]
-                  verdict = "ℹ️ Hash Verified"
+                  verdict = "ℹ️ **Hash Verified**"
               
               short_sha = r["sha256"][:12] + "..."
               md.append(f"| **`{r['filename']}`** | `{r['size_mb']} MB` | [`{short_sha}`]({r['vt_url']}) | [`{badge_status}`]({r['vt_url']}) | {verdict} |")
 
           md.append("")
-          md.append("> *All release artifacts are cryptographically signed with the official DeskHub RSA-2048 PKCS12 key and validated against VirusTotal threat intelligence.*")
+          md.append("> *All release artifacts are cryptographically signed with the official DeskHub RSA-2048 PKCS12 key and searchable on VirusTotal.*")
           md_text = "\n".join(md)
 
           # Write to Step Summary

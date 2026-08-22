@@ -508,7 +508,7 @@ jobs:
               sha = get_sha256(fpath)
               report = {
                   "filename": fname, "size_mb": f"{sz_mb:.2f}", "sha256": sha,
-                  "vt_url": f"https://www.virustotal.com/gui/file/{sha}",
+                  "vt_url": f"https://www.virustotal.com/gui/search/{sha}",
                   "status": "Calculated (SHA-256 Verified)",
                   "malicious": 0, "suspicious": 0, "total_engines": 0
               }
@@ -517,6 +517,7 @@ jobs:
                   results.append(report)
                   continue
 
+              # 1. Query Hash
               try:
                   res = requests.get(f"https://www.virustotal.com/api/v3/files/{sha}", headers=headers, timeout=25)
                   if res.status_code == 200:
@@ -525,10 +526,44 @@ jobs:
                       report["suspicious"] = stats.get("suspicious", 0)
                       report["total_engines"] = sum(stats.values())
                       report["status"] = "Verified Clean" if report["malicious"] == 0 else "Flagged"
+                      report["vt_url"] = f"https://www.virustotal.com/gui/file/{sha}"
                       results.append(report)
                       continue
               except Exception as e:
                   print(f"VT query error: {e}")
+
+              # 2. Upload and Poll
+              analysis_id = None
+              try:
+                  upload_url = "https://www.virustotal.com/api/v3/files"
+                  if sz_mb > 32:
+                      url_res = requests.get("https://www.virustotal.com/api/v3/files/upload_url", headers=headers, timeout=25)
+                      upload_url = url_res.json().get("data", upload_url)
+                  with open(fpath, "rb") as uf:
+                      post_res = requests.post(upload_url, headers=headers, files={"file": (fname, uf)}, timeout=180)
+                      if post_res.status_code in [200, 201]:
+                          analysis_id = post_res.json().get("data", {}).get("id")
+              except Exception as e:
+                  print(f"Upload error: {e}")
+
+              if analysis_id:
+                  poll_start = time.time()
+                  while time.time() - poll_start < 240:
+                      time.sleep(15)
+                      try:
+                          poll_res = requests.get(f"https://www.virustotal.com/api/v3/analyses/{analysis_id}", headers=headers, timeout=25)
+                          if poll_res.status_code == 200:
+                              attr = poll_res.json().get("data", {}).get("attributes", {})
+                              if attr.get("status") == "completed":
+                                  stats = attr.get("stats", {})
+                                  report["malicious"] = stats.get("malicious", 0)
+                                  report["suspicious"] = stats.get("suspicious", 0)
+                                  report["total_engines"] = sum(stats.values())
+                                  report["status"] = "Verified Clean" if report["malicious"] == 0 else "Flagged"
+                                  report["vt_url"] = f"https://www.virustotal.com/gui/file/{sha}"
+                                  break
+                      except Exception as e:
+                          print(f"Polling error: {e}")
 
               results.append(report)
 
