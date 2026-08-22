@@ -88,27 +88,6 @@ public class BannerExploreActivity extends Activity {
 
         setContentView(scroller);
         hideSystemBars();
-
-        // Then refresh from the latest stable Release asset in the background;
-        // re-render only if the content actually changed. Offline / no change /
-        // any error → we silently keep what's already on screen.
-        new Thread(new Runnable() {
-            @Override public void run() {
-                final List<BhExploreManifest.Rail> fresh =
-                    BhExploreManifest.refreshFromNetwork(getApplicationContext());
-                runOnUiThread(new Runnable() {
-                    @Override public void run() {
-                        if (isFinishing()) return;
-                        // Re-render with the freshest rails if they changed, else
-                        // re-render the current ones so a newly-learned "latest"
-                        // version shows the update banner / version readout.
-                        List<BhExploreManifest.Rail> toRender =
-                            (fresh != null && !fresh.isEmpty()) ? fresh : currentRails;
-                        if (toRender != null) renderRails(toRender);
-                    }
-                });
-            }
-        }, "bh-explore-refresh").start();
     }
 
     /** (Re)build the whole list: back button, header, hero, the social/links
@@ -124,11 +103,8 @@ public class BannerExploreActivity extends Activity {
         title.setTextColor(TEXT);
         title.setTextSize(28);
         title.setTypeface(Typeface.DEFAULT_BOLD);
-        title.setPadding(dp(4), dp(6), 0, dp(4));
+        title.setPadding(dp(4), dp(6), 0, dp(14));
         column.addView(title);
-
-        View versionLine = buildVersionLine();
-        if (versionLine != null) column.addView(versionLine);
 
         if (rails == null || rails.isEmpty()) {
             column.addView(emptyState());
@@ -177,100 +153,6 @@ public class BannerExploreActivity extends Activity {
         return bar;
     }
 
-    /** "Version 1.0.5" */
-    private View buildVersionLine() {
-        String installed = BhExploreManifest.installedVersion(this);
-        if (installed == null) installed = "1.0.5";
-
-        TextView tv = new TextView(this);
-        tv.setText("Version " + installed);
-        tv.setTextColor(TEXT_DIM);
-        tv.setTextSize(12);
-        tv.setPadding(dp(4), 0, 0, dp(14));
-        return tv;
-    }
-
-    /** Plain-text version summary for the settings dialog. */
-    private String versionSummary() {
-        String installed = BhExploreManifest.installedVersion(this);
-        String latest = BhExploreManifest.latestVersion(this);
-        StringBuilder sb = new StringBuilder();
-        sb.append("Installed: ").append(installed != null ? installed : "unknown");
-        if (latest != null) {
-            sb.append("\nLatest: ").append(latest);
-            sb.append(BhExploreManifest.updateAvailable(this)
-                ? "  (update available)" : "  (up to date)");
-        }
-        return sb.toString();
-    }
-
-    private boolean showUpdateBanner() {
-        boolean disabled = getSharedPreferences(PREFS, MODE_PRIVATE)
-            .getBoolean(KEY_UPDATE_ALERT_DISABLED, false);
-        return !disabled && BhExploreManifest.updateAvailable(this);
-    }
-
-    /** Dismiss-by-cog amber banner shown when a newer release is available. */
-    private View buildUpdateBanner() {
-        final String latest = BhExploreManifest.latestVersion(this);
-
-        LinearLayout banner = new LinearLayout(this);
-        banner.setOrientation(LinearLayout.HORIZONTAL);
-        banner.setGravity(Gravity.CENTER_VERTICAL);
-        banner.setPadding(dp(16), dp(13), dp(13), dp(13));
-        GradientDrawable bg = new GradientDrawable();
-        bg.setColor(UPDATE_BG);
-        bg.setCornerRadius(dp(14));
-        bg.setStroke(dp(1), UPDATE_STROKE);
-        banner.setBackground(bg);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, -2);
-        lp.bottomMargin = dp(18);
-        banner.setLayoutParams(lp);
-
-        LinearLayout textCol = new LinearLayout(this);
-        textCol.setOrientation(LinearLayout.VERTICAL);
-
-        TextView t = new TextView(this);
-        t.setText("Update available");
-        t.setTextColor(UPDATE_ACCENT);
-        t.setTextSize(15);
-        t.setTypeface(Typeface.DEFAULT_BOLD);
-        textCol.addView(t);
-
-        TextView s = new TextView(this);
-        s.setText(latest != null
-            ? ("Version " + latest + " — tap to download")
-            : "Tap to download the latest version");
-        s.setTextColor(0xFFE7D9B0);
-        s.setTextSize(12);
-        LinearLayout.LayoutParams sLp = new LinearLayout.LayoutParams(-1, -2);
-        sLp.topMargin = dp(2);
-        textCol.addView(s, sLp);
-
-        banner.addView(textCol, new LinearLayout.LayoutParams(0, -2, 1f));
-
-        TextView btn = new TextView(this);
-        btn.setText("Get");
-        btn.setTextColor(0xFF1A1408);
-        btn.setTextSize(13);
-        btn.setTypeface(Typeface.DEFAULT_BOLD);
-        btn.setPadding(dp(18), dp(8), dp(18), dp(8));
-        GradientDrawable btnBg = new GradientDrawable();
-        btnBg.setColor(UPDATE_ACCENT);
-        btnBg.setCornerRadius(dp(18));
-        btn.setBackground(btnBg);
-        LinearLayout.LayoutParams btnLp = new LinearLayout.LayoutParams(-2, -2);
-        btnLp.leftMargin = dp(10);
-        banner.addView(btn, btnLp);
-
-        View.OnClickListener go = new View.OnClickListener() {
-            @Override public void onClick(View v) { openUrl(URL_RELEASES); }
-        };
-        banner.setOnClickListener(go);
-        btn.setOnClickListener(go);
-        return banner;
-    }
-
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
@@ -294,16 +176,14 @@ public class BannerExploreActivity extends Activity {
     private View buildHero(BhExploreManifest.Rail rail) {
         final BhExploreManifest.Card card = rail.cards.get(0);
 
-        // A bundled drawable (e.g. our BannerHub logo) → render it as a crisp,
-        // un-cropped emblem beside the text on a gradient. A network image →
-        // the photo-background-with-scrim style.
-        int logoId = resolveDrawable(card.icon);
-        return logoId != 0 ? buildLogoHero(card, logoId) : buildPhotoHero(card);
+        android.graphics.drawable.Drawable logoDrawable = loadIconOrAsset(card.icon);
+        if (logoDrawable == null) logoDrawable = loadIconOrAsset("bh_explore_logo");
+        if (logoDrawable == null) logoDrawable = loadIconOrAsset("deskhub-logo");
+        return buildLogoHero(card, logoDrawable);
     }
 
-    /** Wide BannerHub wordmark across the top, text below — on a dark band that
-     *  blends the logo's black background. */
-    private View buildLogoHero(final BhExploreManifest.Card card, int logoId) {
+    /** Wide DeskHub emblem across the top, text below. */
+    private View buildLogoHero(final BhExploreManifest.Card card, android.graphics.drawable.Drawable logoDrawable) {
         LinearLayout hero = new LinearLayout(this);
         hero.setOrientation(LinearLayout.VERTICAL);
         hero.setPadding(dp(18), dp(18), dp(18), dp(18));
@@ -322,11 +202,13 @@ public class BannerExploreActivity extends Activity {
         if (notEmpty(card.badge)) hero.addView(badge(card.badge));
 
         ImageView logo = new ImageView(this);
-        logo.setImageResource(logoId);
+        if (logoDrawable != null) {
+            logo.setImageDrawable(logoDrawable);
+        }
         logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
         logo.setAdjustViewBounds(true);
-        LinearLayout.LayoutParams logoLp = new LinearLayout.LayoutParams(-1, dp(64));
-        logoLp.topMargin = dp(10);
+        LinearLayout.LayoutParams logoLp = new LinearLayout.LayoutParams(-1, dp(72));
+        logoLp.topMargin = dp(8);
         logoLp.gravity = Gravity.START;
         hero.addView(logo, logoLp);
 
@@ -682,15 +564,13 @@ public class BannerExploreActivity extends Activity {
 
         View iconView = null;
         if (notEmpty(card.icon)) {
-            try {
-                int id = getResources().getIdentifier(card.icon, "drawable", getPackageName());
-                if (id != 0) {
-                    ImageView iv = new ImageView(this);
-                    iv.setImageResource(id);
-                    iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                    iconView = iv;
-                }
-            } catch (Throwable ignored) { }
+            android.graphics.drawable.Drawable d = loadIconOrAsset(card.icon);
+            if (d != null) {
+                ImageView iv = new ImageView(this);
+                iv.setImageDrawable(d);
+                iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                iconView = iv;
+            }
         }
         if (iconView == null) {
             View chip = new View(this);
@@ -725,6 +605,43 @@ public class BannerExploreActivity extends Activity {
             @Override public void onClick(View v) { dispatch(card); }
         });
         return cardView;
+    }
+
+    /**
+     * Tries loading a drawable from assets first (rock solid in patched APKs),
+     * then falls back to getResources().getIdentifier().
+     */
+    private android.graphics.drawable.Drawable loadIconOrAsset(String name) {
+        if (name == null || name.trim().isEmpty()) return null;
+        String cleanName = name.trim();
+
+        // 1. Check direct APK assets
+        String[] candidates = {
+            cleanName + ".png",
+            "explore/" + cleanName + ".png",
+            cleanName,
+            "explore/" + cleanName,
+            "assets/" + cleanName + ".png",
+            "assets/explore/" + cleanName + ".png"
+        };
+        for (String c : candidates) {
+            try (java.io.InputStream is = getAssets().open(c)) {
+                android.graphics.Bitmap bm = android.graphics.BitmapFactory.decodeStream(is);
+                if (bm != null) {
+                    return new android.graphics.drawable.BitmapDrawable(getResources(), bm);
+                }
+            } catch (Throwable ignored) {}
+        }
+
+        // 2. Check drawable resource ID
+        try {
+            int id = getResources().getIdentifier(cleanName, "drawable", getPackageName());
+            if (id != 0) {
+                return getResources().getDrawable(id, null);
+            }
+        } catch (Throwable ignored) {}
+
+        return null;
     }
 
     // ── Shared bits ───────────────────────────────────────────────────────────

@@ -10,9 +10,9 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version string for APK filenames (e.g. "1.0.5" or "1.0.5-609")'
+        description: 'Version string for APK filenames (e.g. "1.0.6" or "1.0.6-609")'
         required: false
-        default: "1.0.5"
+        default: "1.0.6"
       create_release:
         description: "Create a GitHub Release with APK assets"
         type: boolean
@@ -49,7 +49,7 @@ jobs:
             RAW="${RAW#DeskHub-}"
             RAW="${RAW#HeroHub-}"
           else
-            RAW="1.0.5"
+            RAW="1.0.6"
           fi
           VERSION="${RAW#v}"
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"

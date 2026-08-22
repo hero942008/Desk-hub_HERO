@@ -63,7 +63,7 @@ export default function App() {
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [copied, setCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState<"vulkan_rust" | "overview" | "explorer" | "patches" | "guide">("vulkan_rust");
+  const [activeTab, setActiveTab] = useState<"vulkan_rust" | "changelog" | "overview" | "explorer" | "patches" | "guide">("vulkan_rust");
 
   useEffect(() => {
     fetchProjectData();
@@ -303,7 +303,7 @@ export default function App() {
                 DeskHub emulator
               </h1>
               <span className="bg-indigo-100 text-indigo-900 dark:bg-indigo-900/50 dark:text-indigo-300 text-xs font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
-                <Zap className="w-3 h-3" /> v1.0.5
+                <Zap className="w-3 h-3" /> v1.0.6
               </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -339,11 +339,11 @@ export default function App() {
         <div className="flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
           <span className="font-medium text-xs md:text-sm">
-            تم ضبط هوية <strong className="text-indigo-600 dark:text-indigo-400">DeskHub emulator</strong> بإصدار <strong className="text-purple-600 dark:text-purple-400">v1.0.5</strong> مع محرك <strong className="text-blue-600 dark:text-blue-400">Vulkan 1.3</strong> وإزالة فحص التحديثات المزعج!
+            تم ترقية وتحديث <strong className="text-indigo-600 dark:text-indigo-400">DeskHub emulator</strong> إلى إصدار <strong className="text-purple-600 dark:text-purple-400">v1.0.6</strong> مع تخفيف ضغط المعالج فائق الكفاءة (Low-CPU Wine & Turnip Vulkan 1.4)!
           </span>
         </div>
         <span className="text-xs bg-indigo-600 text-white font-mono px-2.5 py-0.5 rounded-full flex items-center gap-1">
-          <Zap className="w-3 h-3" /> v1.0.5 Ready
+          <Zap className="w-3 h-3" /> v1.0.6 Ready
         </span>
       </div>
 
@@ -360,6 +360,18 @@ export default function App() {
         >
           <Zap className="w-4 h-4 text-amber-500" />
           محرك الرندر Rust & Vulkan ⚡
+        </button>
+        <button
+          id="tab-changelog"
+          onClick={() => setActiveTab("changelog")}
+          className={`py-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 shrink-0 ${
+            activeTab === "changelog"
+              ? "border-purple-600 text-purple-600 dark:text-purple-400 font-semibold"
+              : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+          }`}
+        >
+          <Sparkles className="w-4 h-4 text-purple-500" />
+          سجل التغييرات v1.0.6 (Changelog) 🚀
         </button>
         <button
           id="tab-overview"
@@ -540,6 +552,156 @@ export default function App() {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "changelog" && (
+          <div className="space-y-6">
+            {/* Header Badge */}
+            <div className="bg-gradient-to-r from-purple-900/40 via-indigo-900/30 to-slate-900/40 p-6 rounded-2xl border border-purple-500/30 shadow-lg">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full font-mono">
+                      RELEASE v1.0.6 (Build 1006000)
+                    </span>
+                    <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs px-2.5 py-0.5 rounded-full font-medium">
+                      Ultra-Low CPU Optimization
+                    </span>
+                  </div>
+                  <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight">
+                    سجل التغييرات الرسمي لإصدار DeskHub v1.0.6 (Changelog)
+                  </h2>
+                  <p className="text-xs md:text-sm text-purple-200/80 mt-1">
+                    تقرير شامل ومفصل بكافة التحسينات المطبقة لتقليل الضغط على المعالج (CPU) أثناء محاكاة Wine والرندرة وتشغيل ألعاب الـ AAA الضخمة.
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    const text = `WHAT'S NEW IN DESKHUB EMULATOR v1.0.6\n• Upgraded to version 1.0.6 (Build 1006000)\n• Ultra-Low CPU Wine & Direct3D Emulation Pipeline\n• DXVK Async & Single-Queue VKD3D Pipeline Acceleration\n• Kernel-Level Futex (WINEFSYNC) & Eventfd (WINEESYNC) Synchronization\n• Box64 Dynarec Zero-Spinlock & CPU Scheduling Optimization\n• Zero Background Tracing & Diagnostic Disk I/O Purged\n• Direct-to-Display Native Vulkan 1.3/1.4 Renderer\n• Zero-Copy AHardwareBuffer frame pipeline\n• Persistent VkPipelineCache on NVMe/UFS storage\n• Offline play & clean isolated environment`;
+                    navigator.clipboard.writeText(text);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-semibold transition-all shrink-0 shadow-md"
+                >
+                  {copied ? <Check className="w-4 h-4 text-emerald-300" /> : <Copy className="w-4 h-4" />}
+                  {copied ? "تم نسخ السجل!" : "نسخ نص التغييرات"}
+                </button>
+              </div>
+            </div>
+
+            {/* Detailed Changelog Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Feature 1 */}
+              <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400">
+                    <Zap className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">
+                      1. تسريع وتخفيف ضغط Wine و Direct3D (DXVK / VKD3D)
+                    </h3>
+                    <span className="text-[11px] font-mono text-indigo-500 dark:text-indigo-400">
+                      DXVK_ASYNC=1 | VKD3D single_queue
+                    </span>
+                  </div>
+                </div>
+                <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-1.5 leading-relaxed">
+                  <li>• تفعيل التجميع غير المتزامن للشيدرز (<code className="text-indigo-500 font-mono">DXVK_ASYNC=1</code>) لمنع تجمد المعالج وهبوط الإطارات أثناء تجميع رسوميات الألعاب الضخمة.</li>
+                  <li>• تفعيل معمارية الطابور المفرد في DirectX 12 (<code className="text-indigo-500 font-mono">VKD3D single_queue=1</code>) لتقليل تزاحم الأقفال (Mutex Locks) بين أنوية ARM الكبيرة والصغيرة.</li>
+                  <li>• إيقاف التراكبات الرسومية الزائدة لضمان توجيه 100% من قدرة النواة لمحاكاة اللعبة فقط.</li>
+                </ul>
+              </div>
+
+              {/* Feature 2 */}
+              <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
+                    <Cpu className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">
+                      2. تسريع مزامنة نواة لينكس (Futex & Eventfd)
+                    </h3>
+                    <span className="text-[11px] font-mono text-emerald-500 dark:text-emerald-400">
+                      WINEFSYNC=1 | WINEESYNC=1
+                    </span>
+                  </div>
+                </div>
+                <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-1.5 leading-relaxed">
+                  <li>• استبدال بروتوكول IPC الثقيل لـ wineserver بمزامنة مباشرة عبر نواة أندرويد (<code className="text-emerald-500 font-mono">futex / eventfd</code>).</li>
+                  <li>• إلغاء كافة سجلات التتبع والتصحيح لـ Wine (<code className="text-emerald-500 font-mono">WINEDEBUG=-all</code>) لمنع أي استهلاك غير ضروري لعمليات الإدخال والإخراج.</li>
+                  <li>• دعم العناوين الكبيرة (<code className="text-emerald-500 font-mono">WINE_LARGE_ADDRESS_AWARE=1</code>) لتفادي انهيار ذاكرة ألعاب 32-bit و 64-bit.</li>
+                </ul>
+              </div>
+
+              {/* Feature 3 */}
+              <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400">
+                    <Activity className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">
+                      3. كبح دوران المعالج في Dynarec (Box64 / Box86)
+                    </h3>
+                    <span className="text-[11px] font-mono text-amber-500 dark:text-amber-400">
+                      BOX64_DYNAREC_WAIT=1 | FASTROUND=1
+                    </span>
+                  </div>
+                </div>
+                <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-1.5 leading-relaxed">
+                  <li>• تفعيل <code className="text-amber-500 font-mono">BOX64_DYNAREC_WAIT=1</code> لمنع أنوية المعالج من الدوران بنسبة 100% (Busy-waiting spinlocks) عند انتظار الخيوط.</li>
+                  <li>• ضبط <code className="text-amber-500 font-mono">DYNAREC_BIGBLOCK=2</code> و <code className="text-amber-500 font-mono">FASTROUND=1</code> لتسريع الترجمة اللحظية وتقليل زمن التنفيذ.</li>
+                  <li>• تحديد حدود <code className="text-amber-500 font-mono">MALLOC_ARENA_MAX=2</code> لمنع تفتت الذاكرة وتقليل ضغط الـ Garbage Collector.</li>
+                </ul>
+              </div>
+
+              {/* Feature 4 */}
+              <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-lg bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400">
+                    <ShieldCheck className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">
+                      4. استئصال كامل للتتبعات الخلفية وفحص التحديثات
+                    </h3>
+                    <span className="text-[11px] font-mono text-purple-500 dark:text-purple-400">
+                      Zero Background Tracing | No Disk I/O
+                    </span>
+                  </div>
+                </div>
+                <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-1.5 leading-relaxed">
+                  <li>• حذف خيوط فحص التحديثات الدورية (<code className="text-purple-500 font-mono">bh-explore-refresh</code>) وحظر البانر الإعلاني بالكامل.</li>
+                  <li>• تحييد كتابة ملفات التتبع وسجلات التشخيص إلى القرص (<code className="text-purple-500 font-mono">DebugTrace</code>) لإلغاء أي تأخير ناتج عن وحدات التخزين.</li>
+                  <li>• ضمان عمل واستقرار كافة وظائف التطبيق دون أدنى تأثير على تشغيل الألعاب أو حفظ التقدم.</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* In-App Explore Body Format */}
+            <div className="bg-slate-900 text-slate-100 p-6 rounded-xl border border-slate-800 space-y-3 font-mono text-xs">
+              <div className="flex items-center justify-between text-slate-400 text-[11px]">
+                <span>نص السجل المدمج مباشرة داخل شاشة Explore في تطبيق DeskHub:</span>
+                <span className="text-purple-400">explore/bh_explore.json & BhExploreManifest</span>
+              </div>
+              <pre className="bg-slate-950 p-4 rounded-lg text-emerald-400 leading-relaxed overflow-x-auto">
+{`WHAT'S NEW IN DESKHUB EMULATOR v1.0.6
+• Upgraded to version 1.0.6
+• Ultra-Low CPU Wine & Direct3D Emulation Pipeline
+• DXVK Async & Single-Queue VKD3D Pipeline Acceleration
+• Kernel-Level Futex (WINEFSYNC) & Eventfd (WINEESYNC) Synchronization
+• Box64 Dynarec Zero-Spinlock & Reduced Thread Contention
+• Zero Background Tracing & Diagnostic Disk I/O Purged
+• Direct-to-Display Native Vulkan 1.3/1.4 Renderer
+• Zero-Copy AHardwareBuffer frame pipeline
+• Persistent VkPipelineCache on NVMe/UFS storage
+• Offline play & clean isolated environment`}
+              </pre>
             </div>
           </div>
         )}

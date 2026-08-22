@@ -33,15 +33,56 @@ public final class BhNativeCore {
 
     private static void applyTurnipDriverOptimizations() {
         try {
-            // Turnip (Adreno Mesa) High-Performance Tunings
+            // ── 1. Turnip (Adreno Mesa Vulkan 1.3 / 1.4) High-Performance Tunings ──
             // - noconform: skips non-essential conformance checks for ~5-10% speedup
             // - nobatching: reduces command latency on direct tile renders
-            android.system.Os.setenv("TU_DEBUG", "noconform,nobatching", true);
+            // - sysmem: enables high-efficiency direct system memory attachments
+            android.system.Os.setenv("TU_DEBUG", "noconform,nobatching,sysmem", true);
             android.system.Os.setenv("MESA_VK_WSI_PRESENT_MODE", "mailbox", true);
             android.system.Os.setenv("MESA_NO_ERROR", "1", true);
             android.system.Os.setenv("MESA_GLSL_CACHE_DISABLE", "0", true);
             android.system.Os.setenv("VK_KHR_dynamic_rendering", "1", true);
             android.system.Os.setenv("MESA_VK_ENABLE_SUBGROUP_SIZE", "1", true);
+
+            // ── 2. DXVK & Direct3D Asynchronous CPU Offloading ─────────────────────
+            // Eliminates CPU thread stalls and compilation stutter on heavy AAA titles
+            android.system.Os.setenv("DXVK_ASYNC", "1", true);
+            android.system.Os.setenv("DXVK_STATE_CACHE", "1", true);
+            android.system.Os.setenv("DXVK_HUD", "0", true);
+            android.system.Os.setenv("DXVK_USE_PIPECOMPILER", "1", true);
+
+            // ── 3. VKD3D-Proton (DirectX 12) Low-Overhead Engine ───────────────────
+            // Single-queue reduces mutex contention across big/LITTLE ARM cores
+            android.system.Os.setenv("VKD3D_CONFIG", "dxr=0,pipeline_library=1,upload_hvv=1,single_queue=1", true);
+            android.system.Os.setenv("VKD3D_FEATURE_LEVEL", "12_0", true);
+
+            // ── 4. Wine Synchronization & Kernel Futex Acceleration ────────────────
+            // WINEFSYNC uses fast kernel futexes; WINEESYNC uses eventfd (zero wineserver locks)
+            android.system.Os.setenv("WINEFSYNC", "1", true);
+            android.system.Os.setenv("WINEESYNC", "1", true);
+            android.system.Os.setenv("WINE_DISABLE_FAST_SYNC", "0", true);
+            android.system.Os.setenv("WINE_LARGE_ADDRESS_AWARE", "1", true);
+            android.system.Os.setenv("WINEDEBUG", "-all", true);
+
+            // ── 5. Box64 / Box86 Dynarec Zero-Spinlock & CPU Scheduling ────────────
+            // Stops aggressive busy-waiting CPU spinning on ARM big cores
+            android.system.Os.setenv("BOX64_DYNAREC_FASTROUND", "1", true);
+            android.system.Os.setenv("BOX64_DYNAREC_BIGBLOCK", "2", true);
+            android.system.Os.setenv("BOX64_DYNAREC_SAFEFLAGS", "1", true);
+            android.system.Os.setenv("BOX64_DYNAREC_STRONGMEM", "0", true);
+            android.system.Os.setenv("BOX64_DYNAREC_WAIT", "1", true);
+            android.system.Os.setenv("BOX64_NOBANNER", "1", true);
+            android.system.Os.setenv("BOX64_LOG", "0", true);
+
+            android.system.Os.setenv("BOX86_DYNAREC_FASTROUND", "1", true);
+            android.system.Os.setenv("BOX86_DYNAREC_BIGBLOCK", "2", true);
+            android.system.Os.setenv("BOX86_DYNAREC_WAIT", "1", true);
+            android.system.Os.setenv("BOX86_NOBANNER", "1", true);
+            android.system.Os.setenv("BOX86_LOG", "0", true);
+
+            // ── 6. Low-Fragmentation Memory Allocator Limits ──────────────────────
+            android.system.Os.setenv("MALLOC_ARENA_MAX", "2", true);
+            android.system.Os.setenv("MALLOC_TRIM_THRESHOLD_", "131072", true);
         } catch (Throwable ignored) {
         }
     }

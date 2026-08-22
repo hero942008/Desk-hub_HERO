@@ -32,25 +32,28 @@ public final class DebugTrace {
     private static final SimpleDateFormat TS =
             new SimpleDateFormat("HH:mm:ss.SSS", Locale.US);
 
+    private static final boolean ENABLED = false; // Zero background file I/O overhead
+
     public static void write(String message) {
+        if (!ENABLED) return;
         write(message, null);
     }
 
     /**
      * Zero-argument marker so smali probes can be inserted into methods with
-     * `.locals 0` without needing to materialize a string register. Routes to
-     * write() with the caller-derived tag so the trace file still reads
-     * naturally.
+     * `.locals 0` without needing to materialize a string register.
      */
-    public static void markY4iUpsert() { write("y4i.b ENTRY (retro upsert)"); }
-    public static void markFakeAuth()  { write("FakeAuthToken.get() called"); }
-    public static void markEl7Entry()       { write("el7.invokeSuspend ENTRY"); }
-    public static void markLaunchInsert()   { write("GameLaunchMethodDao.insert PRE"); }
-    public static void markLibraryInsert()  { write("GameLibraryBaseDao.insert PRE"); }
+    public static void markY4iUpsert() { if (ENABLED) write("y4i.b ENTRY (retro upsert)"); }
+    public static void markFakeAuth()  { if (ENABLED) write("FakeAuthToken.get() called"); }
+    public static void markEl7Entry()       { if (ENABLED) write("el7.invokeSuspend ENTRY"); }
+    public static void markLaunchInsert()   { if (ENABLED) write("GameLaunchMethodDao.insert PRE"); }
+    public static void markLibraryInsert()  { if (ENABLED) write("GameLibraryBaseDao.insert PRE"); }
 
     public static void write(String message, Throwable t) {
+        if (!ENABLED) return;
         try {
             File f = ensureFile();
+            if (f == null) return;
             try (PrintWriter pw = new PrintWriter(new FileWriter(f, true))) {
                 pw.print(TS.format(new Date()));
                 pw.print(' ');
@@ -59,16 +62,7 @@ public final class DebugTrace {
                     t.printStackTrace(pw);
                 }
             }
-        } catch (Throwable e) {
-            Log.e(TAG, "DebugTrace.write failed: " + message, e);
-            return;
-        }
-        // Use Log.i — this device's logcat filter strips app-tagged Log.e
-        // for non-system uids, so .e silently disappears from `getlog`.
-        if (t != null) {
-            Log.i(TAG, message, t);
-        } else {
-            Log.i(TAG, message);
+        } catch (Throwable ignored) {
         }
     }
 

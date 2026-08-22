@@ -16,6 +16,8 @@ import app.revanced.patches.gamehub.GAMEHUB_VERSION
 // =========================================================================
 
 private const val DRAWABLE_DIR = "res/drawable"
+private const val ASSETS_DIR = "assets"
+private const val ASSETS_EXPLORE_DIR = "assets/explore"
 
 // resource path (in the patch bundle) -> destination drawable file name
 private val DRAWABLES = mapOf(
@@ -29,8 +31,7 @@ private object ExploreDrawableResources
 @Suppress("unused")
 val exploreDrawablesPatch = resourcePatch(
     name = "Explore drawables",
-    description = "Adds the Explore screen's card artwork (GOG logo) to " +
-        "res/drawable, rendered by BannerExploreActivity's GOG card.",
+    description = "Adds the Explore screen's card artwork to res/drawable and assets, rendered by BannerExploreActivity.",
 ) {
     compatibleWith(GAMEHUB_PACKAGE(GAMEHUB_VERSION))
 
@@ -39,12 +40,24 @@ val exploreDrawablesPatch = resourcePatch(
             ?: error("classloader unavailable for explore drawables")
 
         for ((resource, fileName) in DRAWABLES) {
-            val dest = "$DRAWABLE_DIR/$fileName"
+            // Write to res/drawable
             classLoader.getResourceAsStream(resource)?.use { input ->
-                val destFile = get(dest)
+                val destFile = get("$DRAWABLE_DIR/$fileName")
                 destFile.parentFile?.mkdirs()
                 destFile.outputStream().use { input.copyTo(it) }
-            } ?: error("missing $resource in patch bundle resources")
+            }
+            // Write to assets/
+            classLoader.getResourceAsStream(resource)?.use { input ->
+                val destFile = get("$ASSETS_DIR/$fileName")
+                destFile.parentFile?.mkdirs()
+                destFile.outputStream().use { input.copyTo(it) }
+            }
+            // Write to assets/explore/
+            classLoader.getResourceAsStream(resource)?.use { input ->
+                val destFile = get("$ASSETS_EXPLORE_DIR/$fileName")
+                destFile.parentFile?.mkdirs()
+                destFile.outputStream().use { input.copyTo(it) }
+            }
         }
     }
 }
