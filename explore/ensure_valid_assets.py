@@ -161,6 +161,7 @@ def generate_valid_keystore(output_path):
 PNG_DIMENSIONS = {
     "wine_logo.png": (240, 72, 131, 24, 67, 255),
     "ic_launcher_foreground.png": (432, 432, 99, 102, 241, 255),
+    "ic_launcher.png": (512, 512, 99, 102, 241, 255),
     "features_auth_ic_logo_landscape.png": (96, 96, 49, 46, 129, 255),
     "features_auth_ic_logo_overseas.png": (366, 72, 30, 27, 75, 255),
     "splash_logo.png": (996, 200, 15, 23, 42, 255),
@@ -172,6 +173,43 @@ PNG_DIMENSIONS = {
 def render_artwork_png(filename, target_path):
     os.makedirs(os.path.dirname(target_path), exist_ok=True)
     import subprocess
+    
+    deck_candidates = [
+        os.path.join(REPO, "Deck.png"),
+        os.path.join(REPO, "public", "icon.png"),
+        os.path.join(REPO, "patches", "src", "main", "resources", "bannerhub-icon", "ic_launcher.png")
+    ]
+    deck_src = next((p for p in deck_candidates if os.path.exists(p) and os.path.getsize(p) > 1000), None)
+    
+    if shutil.which("convert") and deck_src:
+        try:
+            if filename == "ic_launcher_foreground.png":
+                cmd = f"convert '{deck_src}' -resize 288x288 -gravity center -background transparent -extent 432x432 '{target_path}'"
+                subprocess.check_call(cmd, shell=True)
+                return True
+            elif filename in ["ic_launcher.png", "bh_explore_logo.png", "bh_explore_gog.png", "bannerhub-v6-logo.png"]:
+                cmd = f"convert '{deck_src}' -resize 512x512 -gravity center -background transparent -extent 512x512 '{target_path}'"
+                subprocess.check_call(cmd, shell=True)
+                return True
+            elif filename == "wine_logo.png":
+                cmd = f"convert '{deck_src}' -resize 64x64 -gravity center -background transparent -extent 240x72 '{target_path}'"
+                subprocess.check_call(cmd, shell=True)
+                return True
+            elif filename == "features_auth_ic_logo_landscape.png":
+                cmd = f"convert '{deck_src}' -resize 96x96 -gravity center -background transparent -extent 96x96 '{target_path}'"
+                subprocess.check_call(cmd, shell=True)
+                return True
+            elif filename == "features_auth_ic_logo_overseas.png":
+                cmd = f"convert '{deck_src}' -resize 366x72 -gravity center -background transparent -extent 366x72 '{target_path}'"
+                subprocess.check_call(cmd, shell=True)
+                return True
+            elif filename == "splash_logo.png":
+                cmd = f"convert '{deck_src}' -resize 996x196 -gravity center -background transparent -extent 996x200 '{target_path}'"
+                subprocess.check_call(cmd, shell=True)
+                return True
+        except Exception as e:
+            print(f"[WARN] convert from deck failed: {e}")
+
     if shutil.which("convert"):
         try:
             if filename == "ic_launcher_foreground.png":
