@@ -8,7 +8,10 @@
 //! - **Input Processing**: Lock-free SPSC event ring-buffer.
 //! - **Compatibility**: 100% full 40-method JNI table for `com.winemu.core.server.XServer`.
 
+pub mod aaudio_engine;
+pub mod asm_sync;
 pub mod components;
+pub mod direct_input;
 pub mod epoll_server;
 pub mod events;
 pub mod legacy_bridge;
@@ -16,20 +19,26 @@ pub mod perf;
 pub mod readout;
 pub mod storage;
 pub mod vibration;
+pub mod vfs_loader;
 pub mod voice;
 pub mod vulkan_advanced;
 pub mod vulkan_renderer;
+pub mod wineserver_ipc;
 
+use aaudio_engine::AAudioStreamEngine;
 use components::NativeComponentScanner;
+use direct_input::DirectTouchDispatcher;
 use epoll_server::EpollMultiplexer;
 use events::{InputEvent, LockFreeEventQueue, MAX_EVENTS_QUEUE};
 use perf::NativePerfEngine;
 use readout::RenderReadoutEngine;
 use storage::NativeMmapStorage;
 use vibration::NativeVibrationEngine;
+use vfs_loader::NativeVfsEngine;
 use voice::NativeVoiceEngine;
 use vulkan_advanced::AdvancedVulkanEngine;
 use vulkan_renderer::VulkanRendererState;
+use wineserver_ipc::WineServerIpcProxy;
 
 use std::ffi::{CStr, CString};
 use std::os::raw::{c_char, c_float, c_int, c_long, c_void};
