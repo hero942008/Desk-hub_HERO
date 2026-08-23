@@ -1,5 +1,10 @@
 name: Release
 
+permissions:
+  contents: write
+  packages: write
+  actions: read
+
 on:
   push:
     branches:
@@ -330,9 +335,11 @@ jobs:
           echo "Ensuring git tag $TAG is created and pushed..."
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git"
           git tag -f "$TAG" "${{ github.sha }}" || true
           git push origin "$TAG" --force 2>/dev/null || true
-          gh api --method POST -H "Accept: application/vnd.github+json" /repos/${{ github.repository }}/git/refs -f ref="refs/tags/$TAG" -f sha="${{ github.sha }}" 2>/dev/null || true
+          gh api --method POST -H "Accept: application/vnd.github+json" /repos/${{ github.repository }}/git/refs -f ref="refs/tags/$TAG" -f sha="${{ github.sha }}" 2>/dev/null || \
+          gh api --method PATCH -H "Accept: application/vnd.github+json" /repos/${{ github.repository }}/git/refs/tags/$TAG -f sha="${{ github.sha }}" -F force=true 2>/dev/null || true
 
       - name: Create GitHub Release
         id: gh_release_step
@@ -342,7 +349,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ needs.build.outputs.tag }}
-          target_commitish: ${{ github.sha }}
           name: BannerHub v6 ${{ needs.build.outputs.version }}
           make_latest: true
           draft: false
@@ -493,6 +499,10 @@ jobs:
           echo "Verifying GitHub Release status for tag $TAG..."
           if ! gh release view "$TAG" >/dev/null 2>&1; then
             echo "Release $TAG does not exist yet. Creating via gh CLI..."
+            gh release create "$TAG" \
+              --title "BannerHub v6 $VER" \
+              --notes "BannerHub v6 $VER - Stable Release" \
+              --latest || \
             gh release create "$TAG" \
               --title "BannerHub v6 $VER" \
               --notes "BannerHub v6 $VER - Stable Release" \
