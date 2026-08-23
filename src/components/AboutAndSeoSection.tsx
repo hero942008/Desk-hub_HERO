@@ -14,6 +14,7 @@ import {
   Terminal,
   ExternalLink,
   Shield,
+  Volume2,
   Gamepad2,
   Flame,
   Award,
@@ -76,8 +77,8 @@ export const AboutAndSeoSection: React.FC = () => {
 - 🗄️ **Memory-Mapped Zstd VFS Engine**: Multi-threaded compressed package loader speeding up Windows game asset loading times by 3-5x.
 - 🚀 **Ultra-Low CPU Direct3D Pipeline**: Pre-configured with \`DXVK_ASYNC=1\` asynchronous shader compilation and VKD3D-Proton single-queue execution to eliminate frame drops and stuttering.
 - 🛡️ **Kernel-Level Synchronization & Inline ARM64 ASM Barriers**: Zero-overhead IPC using Linux \`futex\` (\`WINEFSYNC=1\`) and native \`dmb ish\` / \`isb\` assembly fences.
-- 📦 **9 Side-by-Side Optimized Variants**: Multiple package signatures (\`Optimized\`, \`Normal\`, \`Lite\`, \`PuBG\`, \`AnTuTu\`, \`alt-AnTuTu\`, \`PuBG-CrossFire\`, \`Ludashi\`, \`Genshin\`, \`Original\`) to bypass OEM/driver throttling on Snapdragon & Dimensity chipsets.
-- 🔒 **Privacy-Hardened & No Login**: 100% stripped telemetry, ads, and login bypass allowing direct offline access and component management.
+- 🎮 **Direct Input & AAudio Sound**: Sub-millisecond direct touch uinput dispatching and zero-underrun hardware SIMD audio streaming.
+- 🔒 **100% Offline & Pure Emulation**: Completely purged of upstream telemetry, background trackers, and login gates for pure offline performance.
 - 🔄 **Automated CI/CD Workflows**: Multi-stage GitHub Actions workflows that compile Rust binaries, bundle ReVanced patches, sign APKs with stable v1+v2+v3 keys, and publish releases automatically.`;
 
   return (
@@ -278,11 +279,11 @@ export const AboutAndSeoSection: React.FC = () => {
 
         <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-2">
           <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 w-fit">
-            <Shield className="w-5 h-5" />
+            <Volume2 className="w-5 h-5" />
           </div>
-          <h4 className="font-bold text-sm text-slate-900 dark:text-white">Privacy & Offline</h4>
+          <h4 className="font-bold text-sm text-slate-900 dark:text-white">Direct Input & AAudio</h4>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            حذف كافة أدوات التتبع والحسابات وتوفير وصول كامل دون إنترنت.
+            معالجة الإدخال uinput ومحرك الصوت المباشر AAudio مع تسريع SIMD.
           </p>
         </div>
       </div>

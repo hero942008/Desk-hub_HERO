@@ -1,7 +1,7 @@
 {
   "_comment": "DeskHub Explore manifest.",
-  "version": "1.0.6",
-  "build": 1006000,
+  "version": "1.0.9",
+  "build": 1009000,
   "rails": [
     {
       "type": "hero",
@@ -9,11 +9,11 @@
         {
           "label": "DeskHub emulator",
           "subtitle": "High-performance emulation with Rust Vulkan 1.3/1.4 core",
-          "badge": "DESKHUB v1.0.6",
+          "badge": "DESKHUB v1.0.9",
           "action": "article",
           "icon": "bh_explore_logo",
           "arg": "https://github.com/hero942008/Banerhubhero",
-          "body": "WHAT'S NEW IN DESKHUB EMULATOR v1.0.6\n• Upgraded to version 1.0.6\n• Ultra-Low CPU Wine & Direct3D Emulation Pipeline\n• DXVK Async & Single-Queue VKD3D Pipeline Acceleration\n• Kernel-Level Futex (WINEFSYNC) & Eventfd (WINEESYNC) Synchronization\n• Box64 Dynarec Zero-Spinlock & Reduced Thread Contention\n• Zero Background Tracing & Diagnostic Disk I/O Purged\n• Direct-to-Display Native Vulkan 1.3/1.4 Renderer\n• Zero-Copy AHardwareBuffer frame pipeline\n• Persistent VkPipelineCache on NVMe/UFS storage\n• Offline play & clean isolated environment"
+          "body": "WHAT'S NEW IN DESKHUB EMULATOR v1.0.9\n• Upgraded to version 1.0.9\n• Direct Input & Touch Dispatcher (Direct uinput & Lock-Free SPSC)\n• Google AAudio / Oboe Low-Latency Sound Engine & SIMD Resampling\n• Direct Storage Zstd Memory-Mapped Virtual File System\n• Bare-Metal Inline ARM64 ASM Barriers (ISB/DSB/DMB)\n• Zero-Copy Linux splice/vmsplice Wineserver IPC\n• Ultra-Low CPU Wine & Direct3D (DXVK Async & VKD3D single-queue)\n• Persistent VkPipelineCache on NVMe/UFS storage\n• 100% Offline play & privacy-hardened environment"
         }
       ]
     },

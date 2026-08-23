@@ -300,7 +300,7 @@ export default function App() {
                 DeskHub emulator
               </h1>
               <span className="bg-indigo-100 text-indigo-900 dark:bg-indigo-900/50 dark:text-indigo-300 text-xs font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
-                <Zap className="w-3 h-3" /> v1.0.8
+                <Zap className="w-3 h-3" /> v1.0.9
               </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -336,11 +336,11 @@ export default function App() {
         <div className="flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
           <span className="font-medium text-xs md:text-sm">
-            تم ترقية وتحديث <strong className="text-indigo-600 dark:text-indigo-400">DeskHub emulator</strong> إلى إصدار <strong className="text-purple-600 dark:text-purple-400">v1.0.8</strong> مع تسريع SIMD NEON وتخفيف استهلاك المعالج وأيقونة 4K الفائقة!
+            تم ترقية وتحديث <strong className="text-indigo-600 dark:text-indigo-400">DeskHub emulator</strong> إلى إصدار <strong className="text-purple-600 dark:text-purple-400">v1.0.9</strong> مع Direct Input و AAudio و Zstd VFS وتسريع SIMD NEON!
           </span>
         </div>
         <span className="text-xs bg-indigo-600 text-white font-mono px-2.5 py-0.5 rounded-full flex items-center gap-1">
-          <Zap className="w-3 h-3" /> v1.0.8 Ready
+          <Zap className="w-3 h-3" /> v1.0.9 Ready
         </span>
       </div>
 
@@ -380,7 +380,7 @@ export default function App() {
           }`}
         >
           <Sparkles className="w-4 h-4 text-purple-500" />
-          سجل التغييرات v1.0.8 (Changelog) 🚀
+          سجل التغييرات v1.0.9 (Changelog) 🚀
         </button>
         <button
           id="tab-overview"
