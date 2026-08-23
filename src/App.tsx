@@ -289,11 +289,14 @@ export default function App() {
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 rounded-xl overflow-hidden shadow-md flex items-center justify-center bg-slate-900 border border-indigo-500/30">
             <img
-              src="/assets/deskhub-logo.png"
+              src="/icon.png"
               alt="DeskHub Logo"
               className="w-full h-full object-cover"
               onError={(e) => {
-                e.currentTarget.style.display = 'none';
+                const target = e.currentTarget;
+                if (target.src.indexOf('deskhub-logo.png') === -1) {
+                  target.src = '/assets/deskhub-logo.png';
+                }
               }}
             />
           </div>

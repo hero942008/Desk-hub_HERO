@@ -184,16 +184,16 @@ jobs:
       fail-fast: false
       matrix:
         variant:
-          - { name: DeskHub-Optimized, pkg: "com.xj.herohuboptimized", label: "DeskHub emulator" }
-          - { name: Normal,            pkg: "banner.hub",             label: "DeskHub Normal" }
-          - { name: Normal-GHL,        pkg: "gamehub.lite",            label: "DeskHub Lite" }
-          - { name: PuBG,              pkg: "com.tencent.ig",          label: "DeskHub PuBG" }
-          - { name: AnTuTu,            pkg: "com.antutu.ABenchMark",   label: "DeskHub AnTuTu" }
-          - { name: alt-AnTuTu,        pkg: "com.antutu.benchmark.full", label: "DeskHub alt-AnTuTu" }
-          - { name: PuBG-CrossFire,    pkg: "com.tencent.tmgp.cf",     label: "DeskHub CrossFire" }
-          - { name: Ludashi,           pkg: "com.ludashi.aibench",     label: "DeskHub Ludashi" }
-          - { name: Genshin,           pkg: "com.miHoYo.GenshinImpact", label: "DeskHub Genshin" }
-          - { name: Original,          pkg: "com.xiaoji.egggame",      label: "GameHub" }
+          - { name: Optimized,       pkg: "com.xj.herohuboptimized", label: "DeskHub emulator" }
+          - { name: Normal,          pkg: "banner.hub",             label: "DeskHub Normal" }
+          - { name: Lite,            pkg: "gamehub.lite",            label: "DeskHub Lite" }
+          - { name: PuBG,            pkg: "com.tencent.ig",          label: "DeskHub PuBG" }
+          - { name: AnTuTu,          pkg: "com.antutu.ABenchMark",   label: "DeskHub AnTuTu" }
+          - { name: alt-AnTuTu,      pkg: "com.antutu.benchmark.full", label: "DeskHub alt-AnTuTu" }
+          - { name: PuBG-CrossFire,  pkg: "com.tencent.tmgp.cf",     label: "DeskHub CrossFire" }
+          - { name: Ludashi,         pkg: "com.ludashi.aibench",     label: "DeskHub Ludashi" }
+          - { name: Genshin,         pkg: "com.miHoYo.GenshinImpact", label: "DeskHub Genshin" }
+          - { name: Original,        pkg: "com.xiaoji.egggame",      label: "GameHub" }
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -216,7 +216,7 @@ jobs:
 
       - name: Build & Patch DeskHub APK
         env:
-          FILENAME: DeskHub-emulator-${{ needs.build-patches.outputs.version }}-${{ matrix.variant.name }}.apk
+          FILENAME: DeskHub-${{ needs.build-patches.outputs.version }}-${{ matrix.variant.name }}.apk
         run: |
           set -e
           mkdir -p out

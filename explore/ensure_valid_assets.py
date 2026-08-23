@@ -254,8 +254,7 @@ def scan_and_repair(target_dir):
         for file in files:
             full_path = os.path.join(root, file)
             if file.endswith(".png"):
-                if not is_valid_png(full_path):
-                    print(f"[REPAIR] Invalid PNG signature in {full_path}, recreating...")
+                if not is_valid_png(full_path) or file in PNG_DIMENSIONS:
                     render_artwork_png(file, full_path)
             elif file.endswith(".wav"):
                 if not is_valid_wav(full_path):
