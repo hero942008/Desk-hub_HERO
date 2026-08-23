@@ -1,6 +1,6 @@
 {
   "name": "DeskHub emulator",
-  "description": "DeskHub emulator - High-performance GameHub/DeskHub Android ReVanced modification with Rust Vulkan 1.3 native core, zero-copy pipeline, and automated GitHub Actions CI/CD APK build pipelines.",
+  "description": "DeskHub emulator v1.0.7 - High-performance GameHub Android ReVanced modification with Rust Vulkan 1.3/1.4 native core, zero-copy pipeline, low-CPU Wine Direct3D optimization, and automated GitHub Actions CI/CD APK build pipelines for PC gaming on Android.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

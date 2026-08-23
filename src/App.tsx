@@ -24,8 +24,12 @@ import {
   Gauge,
   Activity,
   Box,
-  Binary
+  Binary,
+  Globe,
+  Tag
 } from "lucide-react";
+import { DeskHubLogo } from "./components/DeskHubLogo";
+import { AboutAndSeoSection } from "./components/AboutAndSeoSection";
 
 interface TreeNode {
   name: string;
@@ -63,7 +67,7 @@ export default function App() {
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [copied, setCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState<"vulkan_rust" | "changelog" | "overview" | "explorer" | "patches" | "guide">("vulkan_rust");
+  const [activeTab, setActiveTab] = useState<"about_seo" | "vulkan_rust" | "changelog" | "overview" | "explorer" | "patches" | "guide">("about_seo");
 
   useEffect(() => {
     fetchProjectData();
@@ -288,17 +292,7 @@ export default function App() {
       <header className="border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur sticky top-0 z-30 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 rounded-xl overflow-hidden shadow-md flex items-center justify-center bg-slate-900 border border-indigo-500/30">
-            <img
-              src="/icon.png"
-              alt="DeskHub Logo"
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                const target = e.currentTarget;
-                if (target.src.indexOf('deskhub-logo.png') === -1) {
-                  target.src = '/assets/deskhub-logo.png';
-                }
-              }}
-            />
+            <DeskHubLogo className="w-full h-full object-cover" />
           </div>
           <div>
             <div className="flex items-center gap-2">
@@ -306,7 +300,7 @@ export default function App() {
                 DeskHub emulator
               </h1>
               <span className="bg-indigo-100 text-indigo-900 dark:bg-indigo-900/50 dark:text-indigo-300 text-xs font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
-                <Zap className="w-3 h-3" /> v1.0.6
+                <Zap className="w-3 h-3" /> v1.0.7
               </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -342,16 +336,28 @@ export default function App() {
         <div className="flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
           <span className="font-medium text-xs md:text-sm">
-            تم ترقية وتحديث <strong className="text-indigo-600 dark:text-indigo-400">DeskHub emulator</strong> إلى إصدار <strong className="text-purple-600 dark:text-purple-400">v1.0.6</strong> مع تخفيف ضغط المعالج فائق الكفاءة (Low-CPU Wine & Turnip Vulkan 1.4)!
+            تم ترقية وتحديث <strong className="text-indigo-600 dark:text-indigo-400">DeskHub emulator</strong> إلى إصدار <strong className="text-purple-600 dark:text-purple-400">v1.0.7</strong> مع صورة الأيقونة الجديدة ودعم محركات البحث (SEO Topics & Description)!
           </span>
         </div>
         <span className="text-xs bg-indigo-600 text-white font-mono px-2.5 py-0.5 rounded-full flex items-center gap-1">
-          <Zap className="w-3 h-3" /> v1.0.6 Ready
+          <Zap className="w-3 h-3" /> v1.0.7 Ready
         </span>
       </div>
 
       {/* Workspace Tabs */}
       <div className="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 flex gap-6 overflow-x-auto">
+        <button
+          id="tab-about-seo"
+          onClick={() => setActiveTab("about_seo")}
+          className={`py-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 shrink-0 ${
+            activeTab === "about_seo"
+              ? "border-indigo-600 text-indigo-600 dark:text-indigo-400 font-semibold"
+              : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+          }`}
+        >
+          <Globe className="w-4 h-4 text-indigo-500" />
+          حول والميتا وسيو البحث (About & SEO) 🔥
+        </button>
         <button
           id="tab-vulkan-rust"
           onClick={() => setActiveTab("vulkan_rust")}
@@ -374,7 +380,7 @@ export default function App() {
           }`}
         >
           <Sparkles className="w-4 h-4 text-purple-500" />
-          سجل التغييرات v1.0.6 (Changelog) 🚀
+          سجل التغييرات v1.0.7 (Changelog) 🚀
         </button>
         <button
           id="tab-overview"
@@ -428,6 +434,7 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className="flex-1 p-4 md:p-6 max-w-7xl w-full mx-auto">
+        {activeTab === "about_seo" && <AboutAndSeoSection />}
         {activeTab === "vulkan_rust" && (
           <div className="space-y-6">
             {/* Performance Stats Cards */}
@@ -567,22 +574,22 @@ export default function App() {
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <span className="bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full font-mono">
-                      RELEASE v1.0.6 (Build 1006000)
+                      RELEASE v1.0.7 (Build 1007000)
                     </span>
                     <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs px-2.5 py-0.5 rounded-full font-medium">
-                      Ultra-Low CPU Optimization
+                      Official SEO & Icon Polish
                     </span>
                   </div>
                   <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight">
-                    سجل التغييرات الرسمي لإصدار DeskHub v1.0.6 (Changelog)
+                    سجل التغييرات الرسمي لإصدار DeskHub v1.0.7 (Changelog)
                   </h2>
                   <p className="text-xs md:text-sm text-purple-200/80 mt-1">
-                    تقرير شامل ومفصل بكافة التحسينات المطبقة لتقليل الضغط على المعالج (CPU) أثناء محاكاة Wine والرندرة وتشغيل ألعاب الـ AAA الضخمة.
+                    تقرير شامل ومفصل بكافة التحديثات المطبقة: رفع الإصدار إلى v1.0.7، دمج هوية الأيقونة الجديدة عالية الدقة، وإضافة أقسام السيو والكلمات المفتاحية لمستودع GitHub ومحرك بحث Google.
                   </p>
                 </div>
                 <button
                   onClick={() => {
-                    const text = `WHAT'S NEW IN DESKHUB EMULATOR v1.0.6\n• Upgraded to version 1.0.6 (Build 1006000)\n• Ultra-Low CPU Wine & Direct3D Emulation Pipeline\n• DXVK Async & Single-Queue VKD3D Pipeline Acceleration\n• Kernel-Level Futex (WINEFSYNC) & Eventfd (WINEESYNC) Synchronization\n• Box64 Dynarec Zero-Spinlock & CPU Scheduling Optimization\n• Zero Background Tracing & Diagnostic Disk I/O Purged\n• Direct-to-Display Native Vulkan 1.3/1.4 Renderer\n• Zero-Copy AHardwareBuffer frame pipeline\n• Persistent VkPipelineCache on NVMe/UFS storage\n• Offline play & clean isolated environment`;
+                    const text = `WHAT'S NEW IN DESKHUB EMULATOR v1.0.7\n• Upgraded release version to v1.0.7 (Build 1007000)\n• High-Resolution App Icon & Branding Integration\n• Complete Google SEO & GitHub Repository Discoverability Suite\n• Ultra-Low CPU Wine & Direct3D Emulation Pipeline\n• DXVK Async & Single-Queue VKD3D Pipeline Acceleration\n• Kernel-Level Futex (WINEFSYNC) & Eventfd (WINEESYNC) Synchronization\n• Box64 Dynarec Zero-Spinlock & CPU Scheduling Optimization\n• Direct-to-Display Native Vulkan 1.3/1.4 Renderer\n• Zero-Copy AHardwareBuffer frame pipeline\n• Persistent VkPipelineCache on NVMe/UFS storage\n• 9 Side-by-Side Optimized Variants for Snapdragon & Dimensity`;
                     navigator.clipboard.writeText(text);
                     setCopied(true);
                     setTimeout(() => setCopied(false), 2000);
