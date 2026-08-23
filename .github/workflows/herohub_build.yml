@@ -322,11 +322,12 @@ jobs:
           TAG: ${{ needs.build-patches.outputs.tag }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Pushing git tag $TAG..."
+          echo "Ensuring git tag $TAG is created and pushed..."
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag -f "$TAG" "${{ github.sha }}" || true
-          git push origin "$TAG" --force 2>/dev/null || true
+          git push origin "$TAG" --force || \
+          gh api --method POST -H "Accept: application/vnd.github+json" /repos/${{ github.repository }}/git/refs -f ref="refs/tags/$TAG" -f sha="${{ github.sha }}" 2>/dev/null || true
 
       - name: Publish GitHub Release (Primary)
         id: create-release
