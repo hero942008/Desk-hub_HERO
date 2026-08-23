@@ -300,7 +300,7 @@ export default function App() {
                 DeskHub emulator
               </h1>
               <span className="bg-indigo-100 text-indigo-900 dark:bg-indigo-900/50 dark:text-indigo-300 text-xs font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
-                <Zap className="w-3 h-3" /> v1.0.7
+                <Zap className="w-3 h-3" /> v1.0.8
               </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -336,11 +336,11 @@ export default function App() {
         <div className="flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
           <span className="font-medium text-xs md:text-sm">
-            تم ترقية وتحديث <strong className="text-indigo-600 dark:text-indigo-400">DeskHub emulator</strong> إلى إصدار <strong className="text-purple-600 dark:text-purple-400">v1.0.7</strong> مع صورة الأيقونة الجديدة ودعم محركات البحث (SEO Topics & Description)!
+            تم ترقية وتحديث <strong className="text-indigo-600 dark:text-indigo-400">DeskHub emulator</strong> إلى إصدار <strong className="text-purple-600 dark:text-purple-400">v1.0.8</strong> مع تسريع SIMD NEON وتخفيف استهلاك المعالج وأيقونة 4K الفائقة!
           </span>
         </div>
         <span className="text-xs bg-indigo-600 text-white font-mono px-2.5 py-0.5 rounded-full flex items-center gap-1">
-          <Zap className="w-3 h-3" /> v1.0.7 Ready
+          <Zap className="w-3 h-3" /> v1.0.8 Ready
         </span>
       </div>
 
@@ -380,7 +380,7 @@ export default function App() {
           }`}
         >
           <Sparkles className="w-4 h-4 text-purple-500" />
-          سجل التغييرات v1.0.7 (Changelog) 🚀
+          سجل التغييرات v1.0.8 (Changelog) 🚀
         </button>
         <button
           id="tab-overview"
@@ -574,22 +574,22 @@ export default function App() {
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <span className="bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full font-mono">
-                      RELEASE v1.0.7 (Build 1007000)
+                      RELEASE v1.0.8 (Build 1008000)
                     </span>
                     <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs px-2.5 py-0.5 rounded-full font-medium">
-                      Official SEO & Icon Polish
+                      SIMD Vectorized & Maximum FPS
                     </span>
                   </div>
                   <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight">
-                    سجل التغييرات الرسمي لإصدار DeskHub v1.0.7 (Changelog)
+                    سجل التغييرات الرسمي لإصدار DeskHub v1.0.8 (Changelog)
                   </h2>
                   <p className="text-xs md:text-sm text-purple-200/80 mt-1">
-                    تقرير شامل ومفصل بكافة التحديثات المطبقة: رفع الإصدار إلى v1.0.7، دمج هوية الأيقونة الجديدة عالية الدقة، وإضافة أقسام السيو والكلمات المفتاحية لمستودع GitHub ومحرك بحث Google.
+                    تقرير شامل ومفصل بكافة التحديثات المطبقة: رفع الإصدار إلى v1.0.8، معالجة SIMD NEON/AVX2 المسرعة بالعتاد، تخفيف ضغط المعالج إلى الحد الأدنى، وتوليد أيقونة 4K فائقة الدقة.
                   </p>
                 </div>
                 <button
                   onClick={() => {
-                    const text = `WHAT'S NEW IN DESKHUB EMULATOR v1.0.7\n• Upgraded release version to v1.0.7 (Build 1007000)\n• High-Resolution App Icon & Branding Integration\n• Complete Google SEO & GitHub Repository Discoverability Suite\n• Ultra-Low CPU Wine & Direct3D Emulation Pipeline\n• DXVK Async & Single-Queue VKD3D Pipeline Acceleration\n• Kernel-Level Futex (WINEFSYNC) & Eventfd (WINEESYNC) Synchronization\n• Box64 Dynarec Zero-Spinlock & CPU Scheduling Optimization\n• Direct-to-Display Native Vulkan 1.3/1.4 Renderer\n• Zero-Copy AHardwareBuffer frame pipeline\n• Persistent VkPipelineCache on NVMe/UFS storage\n• 9 Side-by-Side Optimized Variants for Snapdragon & Dimensity`;
+                    const text = `WHAT'S NEW IN DESKHUB EMULATOR v1.0.8\n• Upgraded release version to v1.0.8 (Build 1008000)\n• ARM NEON (aarch64) and AVX2 (x86_64) SIMD 128-byte unrolled frame readout pipeline\n• High-Resolution 4K App Icon & Modern Hexagonal Cybernetic Design\n• Complete Google SEO & GitHub Repository Discoverability Suite\n• Ultra-Low CPU Wine & Direct3D Emulation Pipeline\n• DXVK Async & Single-Queue VKD3D Pipeline Acceleration\n• Kernel-Level Futex (WINEFSYNC) & Eventfd (WINEESYNC) Synchronization\n• Box64 Dynarec Zero-Spinlock & Real-Time CPU Pinning\n• Direct-to-Display Native Vulkan 1.3/1.4 Renderer\n• Zero-Copy AHardwareBuffer frame pipeline\n• Persistent VkPipelineCache on NVMe/UFS storage\n• 9 Side-by-Side Optimized Variants for Snapdragon & Dimensity`;
                     navigator.clipboard.writeText(text);
                     setCopied(true);
                     setTimeout(() => setCopied(false), 2000);

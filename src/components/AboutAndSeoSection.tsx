@@ -38,6 +38,8 @@ export const AboutAndSeoSection: React.FC = () => {
     "wine-android",
     "pc-gaming-on-android",
     "vulkan-1-3",
+    "vulkan-1-4",
+    "simd-neon",
     "turnip-driver",
     "dxvk",
     "vkd3d-proton",
@@ -54,21 +56,21 @@ export const AboutAndSeoSection: React.FC = () => {
   ];
 
   const shortDescription =
-    "DeskHub emulator v1.0.7 - High-performance GameHub ReVanced modification with Rust Vulkan 1.3/1.4 native core, Ultra-Low CPU Wine Direct3D optimization, zero-copy frame pipeline, and automated GitHub Actions CI/CD APK builds for playing AAA Windows & Steam games on Android.";
+    "DeskHub emulator v1.0.8 - High-performance GameHub ReVanced modification with Rust Vulkan 1.3/1.4 native core, ARM NEON/AVX2 SIMD vectorization, Ultra-Low CPU Wine Direct3D optimization, zero-copy frame pipeline, and automated GitHub Actions CI/CD APK builds for playing AAA Windows & Steam games on Android.";
 
   const githubAbout =
-    "⚡ DeskHub emulator v1.0.7: Next-Gen PC gaming on Android (GameHub ReVanced mod). Powered by Rust native Vulkan 1.3/1.4 engine, DXVK Async, VKD3D single-queue, kernel Futex/Eventfd, and automated CI/CD builds.";
+    "⚡ DeskHub emulator v1.0.8: Next-Gen PC gaming on Android (GameHub ReVanced mod). Powered by Rust native Vulkan 1.3/1.4 engine, ARM NEON SIMD vectorization, DXVK Async, VKD3D single-queue, kernel Futex/Eventfd, and automated CI/CD builds.";
 
-  const fullMarkdownAbout = `## 🎮 About DeskHub emulator v1.0.7
+  const fullMarkdownAbout = `## 🎮 About DeskHub emulator v1.0.8
 
-**DeskHub emulator** is the premier, high-performance Android ReVanced modification based on **XiaoJi GameHub 6.0.9**, re-engineered from the ground up with a **native Rust Vulkan 1.3/1.4 core** for ultra-low latency, zero-copy presentation, and uncompromised frame rates when running AAA PC and Steam games on ARM64 Android devices.
+**DeskHub emulator** is the premier, high-performance Android ReVanced modification based on **XiaoJi GameHub 6.0.9**, re-engineered from the ground up with a **native Rust Vulkan 1.3/1.4 core** and **ARM NEON SIMD vectorization** for ultra-low latency, zero-copy presentation, and uncompromised frame rates when running AAA PC and Steam games on ARM64 Android devices.
 
 ### 🌟 Key Highlights & Architectural Features
 
-- ⚡ **Zero-Copy Native Vulkan Core**: Pure Rust \`xserver_shim\` native pipeline interfacing directly with \`ANativeWindow\` and \`AHardwareBuffer\`, replacing legacy synchronized C rendering bottlenecks.
+- ⚡ **Zero-Copy Native Vulkan Core & SIMD Pipeline**: Pure Rust \`xserver_shim\` native pipeline interfacing directly with \`ANativeWindow\` and \`AHardwareBuffer\`, accelerated with 128-byte unrolled ARM NEON (AArch64) registers for instantaneous pixel transfers without CPU thrashing.
 - 🚀 **Ultra-Low CPU Direct3D Pipeline**: Pre-configured with \`DXVK_ASYNC=1\` asynchronous shader compilation and VKD3D-Proton single-queue execution to eliminate frame drops and stuttering.
 - 🛡️ **Kernel-Level Synchronization**: Zero-overhead IPC using Linux \`futex\` (\`WINEFSYNC=1\`) and \`eventfd\` (\`WINEESYNC=1\`), eliminating wineserver polling overhead.
-- 🎯 **Lock-Free SPSC Input Queues**: Sub-millisecond touch, mouse, and Dual-Motor XInput vibration rumble routing without Android Garbage Collector pauses.
+- 🎯 **Lock-Free SPSC Input Queues**: Cacheline-separated (64-byte aligned) sub-millisecond touch, mouse, and Dual-Motor XInput vibration rumble routing without Android Garbage Collector pauses.
 - 📦 **9 Side-by-Side Optimized Variants**: Multiple package signatures (\`Optimized\`, \`Normal\`, \`Lite\`, \`PuBG\`, \`AnTuTu\`, \`alt-AnTuTu\`, \`PuBG-CrossFire\`, \`Ludashi\`, \`Genshin\`, \`Original\`) to bypass OEM/driver throttling on Snapdragon & Dimensity chipsets.
 - 🔒 **Privacy-Hardened & No Login**: 100% stripped telemetry, ads, and login bypass allowing direct offline access and component management.
 - 🔄 **Automated CI/CD Workflows**: Multi-stage GitHub Actions workflows that compile Rust binaries, bundle ReVanced patches, sign APKs with stable v1+v2+v3 keys, and publish releases automatically.`;
@@ -86,10 +88,10 @@ export const AboutAndSeoSection: React.FC = () => {
           <div className="flex-1 text-center md:text-right space-y-2">
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
               <span className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wider">
-                Official Release v1.0.7
+                Official Release v1.0.8
               </span>
               <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs px-2.5 py-0.5 rounded-full font-medium">
-                Google Search & SEO Ready
+                SIMD Vectorized & Low CPU
               </span>
               <span className="bg-purple-500/20 text-purple-300 border border-purple-500/40 text-xs px-2.5 py-0.5 rounded-full font-medium">
                 GameHub ReVanced Engine
@@ -101,7 +103,7 @@ export const AboutAndSeoSection: React.FC = () => {
             </h2>
 
             <p className="text-sm md:text-base text-slate-300 max-w-3xl leading-relaxed">
-              محرك ReVanced المتطور المبني على نواة Rust و Vulkan 1.3/1.4 مع تخفيف ضغط المعالج إلى الحد الأدنى لتشغيل ألعاب Windows والـ Steam بسلاسة فائقة.
+              محرك ReVanced المتطور المبني على نواة Rust و تسريع SIMD NEON مع تخفيف ضغط المعالج إلى الحد الأدنى لتشغيل ألعاب Windows والـ Steam بسلاسة فائقة.
             </p>
           </div>
         </div>
