@@ -8,7 +8,7 @@
 [![Native Runtime](https://img.shields.io/badge/Core-Rust%202021%20%7C%20C%2B%2B20-orange.svg)](https://www.rust-lang.org/)
 [![License](https://img.shields.io/badge/License-GPL%20v3.0-green.svg)](LICENSE)
 
-> **DeskHub (v1.0.9)** is an ultra-optimized, low-latency Windows emulation and rendering framework for Android. Designed specifically for Qualcomm Snapdragon Adreno GPUs via the **Mesa Turnip driver** and modern ARM64 SoCs, DeskHub delivers desktop-grade gaming performance with bare-metal speed and minimal CPU overhead.
+> **DeskHub (v1.1.0)** is an ultra-optimized, low-latency Windows emulation and rendering framework for Android. Designed specifically for Qualcomm Snapdragon Adreno GPUs via the **Mesa Turnip driver** and modern ARM64 SoCs, DeskHub delivers desktop-grade gaming performance with bare-metal speed and minimal CPU overhead.
 
 ---
 
@@ -44,7 +44,7 @@
 
 ## 📊 Performance Benchmarks & CPU Profile
 
-| Metric | Before Optimization | DeskHub v1.0.9 (Vulkan 1.4 + Rust + AAudio + Direct Input) | Improvement |
+| Metric | Before Optimization | DeskHub v1.1.0 (Vulkan 1.4 + Rust + AAudio + Direct Input) | Improvement |
 |---|---|---|---|
 | **CPU Render Overhead** | 24.8% CPU Usage | **2.8% CPU Usage** | **-88.7% CPU Reduction** |
 | **Input Latency** | 12-16 ms (JNI Locked) | **< 0.5 ms (Direct uinput SPSC)** | **30x Faster Input Response** |

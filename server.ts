@@ -43,7 +43,7 @@ async function startServer() {
     res.json({
       exists: true,
       name: "DeskHub emulator",
-      version: "v1.0.9",
+      version: "v1.1.0",
       sourceUrl: "https://github.com/hero942008/Banerhubhero",
       targetApp: "DeskHub emulator (com.xj.herohuboptimized)",
       totalFiles: filesCount,

@@ -60,12 +60,12 @@ export const AboutAndSeoSection: React.FC = () => {
   ];
 
   const shortDescription =
-    "DeskHub emulator v1.0.9 - Ultra-high performance GameHub ReVanced modification with Rust Vulkan 1.3/1.4 native core, Direct Input uinput dispatcher, AAudio Oboe lock-free audio engine, memory-mapped Zstd VFS, ARM NEON SIMD vectorization, and automated GitHub Actions CI/CD APK builds.";
+    "DeskHub emulator v1.1.0 - Ultra-high performance GameHub ReVanced modification with Rust Vulkan 1.3/1.4 native core, Direct Input uinput dispatcher, AAudio Oboe lock-free audio engine, memory-mapped Zstd VFS, ARM NEON SIMD vectorization, and automated GitHub Actions CI/CD APK builds.";
 
   const githubAbout =
-    "⚡ DeskHub emulator v1.0.9: Next-Gen PC gaming on Android (GameHub ReVanced mod). Powered by Rust native Vulkan 1.3/1.4 engine, Direct Input uinput, AAudio lock-free audio, Zstd VFS, DXVK Async, and automated CI/CD builds.";
+    "⚡ DeskHub emulator v1.1.0: Next-Gen PC gaming on Android (GameHub ReVanced mod). Powered by Rust native Vulkan 1.3/1.4 engine, Direct Input uinput, AAudio lock-free audio, Zstd VFS, DXVK Async, and automated CI/CD builds.";
 
-  const fullMarkdownAbout = `## 🎮 About DeskHub emulator v1.0.9
+  const fullMarkdownAbout = `## 🎮 About DeskHub emulator v1.1.0
 
 **DeskHub emulator** is the premier, ultra-high-performance Android ReVanced modification based on **XiaoJi GameHub 6.0.9**, re-engineered with a **native Rust Vulkan 1.3/1.4 core**, **Direct Input uinput dispatcher**, **AAudio low-latency sound engine**, **Memory-Mapped Zstd VFS**, and **ARM NEON SIMD vectorization** for playing AAA PC and Steam games on ARM64 Android devices.
 
@@ -94,7 +94,7 @@ export const AboutAndSeoSection: React.FC = () => {
           <div className="flex-1 text-center md:text-right space-y-2">
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
               <span className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wider">
-                Official Release v1.0.9
+                Official Release v1.1.0
               </span>
               <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs px-2.5 py-0.5 rounded-full font-medium">
                 Bare-Metal Rust & SIMD

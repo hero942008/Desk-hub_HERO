@@ -14,9 +14,9 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version string for APK filenames + release tag (e.g. "1.0.9-609-opt" or "1.0.9").'
+        description: 'Version string for APK filenames + release tag (e.g. "1.1.0-609-opt" or "1.1.0").'
         required: false
-        default: "1.0.9"
+        default: "1.1.0"
       stable:
         description: "Cut a stable GitHub Release with APK assets"
         type: boolean
@@ -83,7 +83,7 @@ jobs:
           elif [[ "${GITHUB_REF_NAME}" == v* ]] || [[ "${GITHUB_REF_NAME}" == DeskHub-* ]] || [[ "${GITHUB_REF_NAME}" == GameHub-* ]] || [[ "${GITHUB_REF_NAME}" == HeroHub-* ]]; then
             RAW="${GITHUB_REF_NAME}"
           else
-            RAW="1.0.9"
+            RAW="1.1.0"
           fi
           VERSION="${RAW#v}"
           VERSION="${VERSION#DeskHub-}"
