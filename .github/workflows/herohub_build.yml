@@ -65,7 +65,7 @@ jobs:
         run: |
           if [ -d "bannerhub-revanced-1.0.0-609" ] && [ -f "bannerhub-revanced-1.0.0-609/gradlew" ]; then
             echo "Working from bannerhub-revanced-1.0.0-609 directory..."
-            cp -r bannerhub-revanced-1.0.0-609/* .
+            rsync -a --delete bannerhub-revanced-1.0.0-609/ . || cp -rf bannerhub-revanced-1.0.0-609/* .
           fi
           chmod +x gradlew 2>/dev/null || true
           mkdir -p gradle/wrapper

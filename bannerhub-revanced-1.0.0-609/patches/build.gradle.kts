@@ -1,13 +1,13 @@
-group = "com.github.herohuboptimized"
+group = "com.github.deskhubemulator"
 
 patches {
     about {
-        name = "HeroHub Optimized"
-        description = "HeroHub Optimized patches for GameHub with high-performance Rust Vulkan 1.3 core, zero-copy rendering, and low latency input."
-        source = "https://github.com/herohuboptimized/herohub-optimized"
-        author = "HeroHub"
-        contact = "https://github.com/herohuboptimized"
-        website = "https://github.com/herohuboptimized/herohub-optimized"
+        name = "DeskHub emulator"
+        description = "DeskHub emulator patches with high-performance Rust Vulkan 1.3 core, zero-copy rendering, and low latency input."
+        source = "https://github.com/hero942008/Banerhubhero"
+        author = "DeskHub"
+        contact = "https://github.com/hero942008/Banerhubhero"
+        website = "https://github.com/hero942008/Banerhubhero"
         license = "GNU General Public License v3.0"
     }
 }

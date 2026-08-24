@@ -159,15 +159,15 @@ def generate_valid_keystore(output_path):
         print(f"[ERROR] openssl failed: {e}")
 
 PNG_DIMENSIONS = {
-    "wine_logo.png": (240, 72, 131, 24, 67, 255),
-    "ic_launcher_foreground.png": (432, 432, 99, 102, 241, 255),
-    "ic_launcher.png": (512, 512, 99, 102, 241, 255),
-    "features_auth_ic_logo_landscape.png": (96, 96, 49, 46, 129, 255),
-    "features_auth_ic_logo_overseas.png": (366, 72, 30, 27, 75, 255),
-    "splash_logo.png": (996, 200, 15, 23, 42, 255),
-    "bh_explore_gog.png": (512, 512, 88, 28, 135, 255),
-    "bh_explore_logo.png": (512, 512, 30, 27, 75, 255),
-    "bannerhub-v6-logo.png": (512, 512, 30, 27, 75, 255),
+    "wine_logo.png": (240, 72, 11, 14, 20, 255),
+    "ic_launcher_foreground.png": (432, 432, 11, 14, 20, 255),
+    "ic_launcher.png": (512, 512, 11, 14, 20, 255),
+    "features_auth_ic_logo_landscape.png": (96, 96, 11, 14, 20, 255),
+    "features_auth_ic_logo_overseas.png": (366, 72, 11, 14, 20, 255),
+    "splash_logo.png": (996, 200, 11, 14, 20, 255),
+    "bh_explore_gog.png": (512, 512, 11, 14, 20, 255),
+    "bh_explore_logo.png": (512, 512, 11, 14, 20, 255),
+    "bannerhub-v6-logo.png": (512, 512, 11, 14, 20, 255),
 }
 
 def render_artwork_png(filename, target_path):
@@ -175,6 +175,9 @@ def render_artwork_png(filename, target_path):
     import subprocess
     
     deck_candidates = [
+        os.path.join(REPO, "src", "assets", "images", "deskhub_v108_icon_1787518506267.jpg"),
+        os.path.join(REPO, "src", "assets", "images", "deskhub_logo_1787433177158.jpg"),
+        os.path.join(REPO, "Deck.jpg"),
         os.path.join(REPO, "Deck.png"),
         os.path.join(REPO, "public", "icon.png"),
         os.path.join(REPO, "patches", "src", "main", "resources", "bannerhub-icon", "ic_launcher.png")
@@ -184,65 +187,33 @@ def render_artwork_png(filename, target_path):
     if shutil.which("convert") and deck_src:
         try:
             if filename == "ic_launcher_foreground.png":
-                cmd = f"convert '{deck_src}' -resize 288x288 -gravity center -background transparent -extent 432x432 '{target_path}'"
+                cmd = f"convert '{deck_src}' -resize 432x432 -gravity center '{target_path}'"
                 subprocess.check_call(cmd, shell=True)
                 return True
             elif filename in ["ic_launcher.png", "bh_explore_logo.png", "bh_explore_gog.png", "bannerhub-v6-logo.png"]:
-                cmd = f"convert '{deck_src}' -resize 512x512 -gravity center -background transparent -extent 512x512 '{target_path}'"
+                cmd = f"convert '{deck_src}' -resize 512x512 -gravity center '{target_path}'"
                 subprocess.check_call(cmd, shell=True)
                 return True
             elif filename == "wine_logo.png":
-                cmd = f"convert '{deck_src}' -resize 64x64 -gravity center -background transparent -extent 240x72 '{target_path}'"
+                cmd = f"convert '{deck_src}' -resize 240x72 -gravity center '{target_path}'"
                 subprocess.check_call(cmd, shell=True)
                 return True
             elif filename == "features_auth_ic_logo_landscape.png":
-                cmd = f"convert '{deck_src}' -resize 96x96 -gravity center -background transparent -extent 96x96 '{target_path}'"
+                cmd = f"convert '{deck_src}' -resize 96x96 -gravity center '{target_path}'"
                 subprocess.check_call(cmd, shell=True)
                 return True
             elif filename == "features_auth_ic_logo_overseas.png":
-                cmd = f"convert '{deck_src}' -resize 366x72 -gravity center -background transparent -extent 366x72 '{target_path}'"
+                cmd = f"convert '{deck_src}' -resize 366x72 -gravity center '{target_path}'"
                 subprocess.check_call(cmd, shell=True)
                 return True
             elif filename == "splash_logo.png":
-                cmd = f"convert '{deck_src}' -resize 996x196 -gravity center -background transparent -extent 996x200 '{target_path}'"
+                cmd = f"convert '{deck_src}' -resize 996x200 -gravity center '{target_path}'"
                 subprocess.check_call(cmd, shell=True)
                 return True
         except Exception as e:
             print(f"[WARN] convert from deck failed: {e}")
 
-    if shutil.which("convert"):
-        try:
-            if filename == "ic_launcher_foreground.png":
-                cmd = ("convert -size 432x432 xc:none "
-                       "-fill '#4338ca' -stroke '#6366f1' -strokewidth 4 -draw 'roundrectangle 100,140 332,292 60,60' "
-                       "-fill '#1e1b4b' -stroke '#818cf8' -strokewidth 3 -draw 'roundrectangle 116,155 316,277 45,45' "
-                       "-fill '#38bdf8' -stroke none -draw 'rectangle 145,205 175,225' -draw 'rectangle 155,195 165,235' "
-                       "-fill '#ec4899' -draw 'circle 270,205 270,212' -fill '#38bdf8' -draw 'circle 290,215 290,222' "
-                       "-fill '#10b981' -draw 'circle 270,225 270,232' -fill '#f59e0b' -draw 'circle 250,215 250,222' "
-                       "-fill '#a855f7' -stroke '#ffffff' -strokewidth 2 -draw 'polygon 216,190 230,205 225,230 207,230 202,205' "
-                       f"'{target_path}'")
-                subprocess.check_call(cmd, shell=True)
-                return True
-            elif filename == "wine_logo.png":
-                cmd = ("convert -size 240x72 xc:none "
-                       "-fill '#831843' -stroke '#f43f5e' -strokewidth 2 -draw 'roundrectangle 10,10 230,62 16,16' "
-                       "-fill '#f43f5e' -stroke '#ffffff' -strokewidth 2 -draw 'circle 36,36 36,48' "
-                       "-fill '#ffffff' -stroke none -draw 'polygon 36,26 44,38 28,38' -draw 'rectangle 34,38 38,48' "
-                       f"'{target_path}'")
-                subprocess.check_call(cmd, shell=True)
-                return True
-            elif filename in ["bh_explore_logo.png", "bannerhub-v6-logo.png"]:
-                cmd = ("convert -size 512x512 xc:none "
-                       "-fill '#1e1b4b' -stroke '#6366f1' -strokewidth 6 -draw 'roundrectangle 30,30 482,482 80,80' "
-                       "-fill '#4338ca' -stroke '#a855f7' -strokewidth 4 -draw 'polygon 256,90 410,180 370,390 142,390 102,180' "
-                       "-fill '#ffffff' -stroke none -draw 'polygon 256,150 280,210 345,210 292,250 312,310 256,275 200,310 220,250 167,210 232,210' "
-                       f"'{target_path}'")
-                subprocess.check_call(cmd, shell=True)
-                return True
-        except Exception:
-            pass
-
-    dim = PNG_DIMENSIONS.get(filename, (512, 512, 99, 102, 241, 255))
+    dim = PNG_DIMENSIONS.get(filename, (512, 512, 11, 14, 20, 255))
     with open(target_path, "wb") as f:
         f.write(create_valid_png_bytes(dim[0], dim[1], dim[2], dim[3], dim[4], dim[5]))
     return True
@@ -254,8 +225,7 @@ def scan_and_repair(target_dir):
         for file in files:
             full_path = os.path.join(root, file)
             if file.endswith(".png"):
-                if not is_valid_png(full_path):
-                    print(f"[REPAIR] Invalid PNG signature in {full_path}, recreating...")
+                if not is_valid_png(full_path) or file in PNG_DIMENSIONS:
                     render_artwork_png(file, full_path)
             elif file.endswith(".wav"):
                 if not is_valid_wav(full_path):

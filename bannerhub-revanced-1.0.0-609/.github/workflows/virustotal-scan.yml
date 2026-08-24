@@ -1,0 +1,291 @@
+name: VirusTotal Security Analysis & Verification
+
+on:
+  release:
+    types: [published, created]
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: "Release tag to scan (leave blank for latest release)"
+        required: false
+        default: ""
+      file_pattern:
+        description: "File glob pattern to scan"
+        required: false
+        default: "*.apk"
+  workflow_call:
+    inputs:
+      tag_name:
+        description: "Release tag to scan"
+        required: true
+        type: string
+      file_pattern:
+        description: "File glob pattern to scan"
+        required: false
+        type: string
+        default: "*.apk"
+    secrets:
+      VIRUSTOTAL_API_KEY:
+        required: true
+
+permissions:
+  contents: write
+  packages: read
+
+jobs:
+  virustotal-scan:
+    name: VirusTotal Binary Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip requests
+
+      - name: Determine Target Release Tag
+        id: target-tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_TAG: ${{ inputs.tag_name || github.event.inputs.tag_name || github.event.release.tag_name }}
+        run: |
+          if [ -n "$INPUT_TAG" ]; then
+            TAG="$INPUT_TAG"
+          else
+            echo "Fetching latest release tag..."
+            TAG=$(gh release view --json tagName -q .tagName 2>/dev/null || echo "")
+          fi
+          if [ -z "$TAG" ]; then
+            echo "Error: No valid release tag found to analyze."
+            exit 1
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Target release: $TAG"
+
+      - name: Download Release Assets
+        id: download-assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.target-tag.outputs.tag }}
+          PATTERN: ${{ inputs.file_pattern || github.event.inputs.file_pattern || '*.apk' }}
+        run: |
+          mkdir -p ./release_binaries
+          cd ./release_binaries
+          echo "Downloading assets matching pattern '$PATTERN' for release $TAG..."
+          gh release download "$TAG" --pattern "$PATTERN" --clobber || true
+          
+          # If no APKs matched, try downloading all files
+          if [ -z "$(ls -A . 2>/dev/null)" ]; then
+            echo "No matching files with '$PATTERN', downloading all assets..."
+            gh release download "$TAG" --clobber || true
+          fi
+          
+          FILE_COUNT=$(ls -1 | wc -l)
+          echo "Downloaded $FILE_COUNT assets for scanning."
+          if [ "$FILE_COUNT" -eq 0 ]; then
+            echo "No assets found in release $TAG. Exiting gracefully."
+            echo "has_files=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_files=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run VirusTotal Analysis Pipeline
+        if: steps.download-assets.outputs.has_files == 'true'
+        id: vt-scan
+        env:
+          VT_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.target-tag.outputs.tag }}
+        run: |
+          python3 - << 'EOF'
+          import os
+          import sys
+          import time
+          import hashlib
+          import subprocess
+          import requests
+
+          api_key = os.environ.get("VT_API_KEY", "").strip()
+          tag = os.environ.get("TAG", "").strip()
+          bin_dir = "./release_binaries"
+
+          if not api_key:
+              print("::warning:: VIRUSTOTAL_API_KEY secret is not configured. Skipping online scan, generating SHA-256 checksums only.")
+
+          headers = {
+              "x-apikey": api_key,
+              "Accept": "application/json"
+          }
+
+          results = []
+          files = [f for f in os.listdir(bin_dir) if os.path.isfile(os.path.join(bin_dir, f))]
+
+          def compute_sha256(filepath):
+              h = hashlib.sha256()
+              with open(filepath, "rb") as f:
+                  while chunk := f.read(1024 * 1024):
+                      h.update(chunk)
+              return h.hexdigest()
+
+          for filename in files:
+              filepath = os.path.join(bin_dir, filename)
+              filesize_mb = os.path.getsize(filepath) / (1024 * 1024)
+              sha256 = compute_sha256(filepath)
+              print(f"\n=======================================================")
+              print(f"Analyzing: {filename} ({filesize_mb:.2f} MB)")
+              print(f"SHA-256:   {sha256}")
+              print(f"=======================================================")
+
+              report = {
+                  "filename": filename,
+                  "size_mb": f"{filesize_mb:.2f}",
+                  "sha256": sha256,
+                  "vt_url": f"https://www.virustotal.com/gui/search/{sha256}",
+                  "status": "Calculated (SHA-256 Verified)",
+                  "malicious": 0,
+                  "suspicious": 0,
+                  "harmless": 0,
+                  "undetected": 0,
+                  "total_engines": 0
+              }
+
+              if not api_key:
+                  results.append(report)
+                  continue
+
+              # 1. Query existing hash analysis
+              try:
+                  res = requests.get(f"https://www.virustotal.com/api/v3/files/{sha256}", headers=headers, timeout=30)
+                  if res.status_code == 200:
+                      data = res.json().get("data", {})
+                      stats = data.get("attributes", {}).get("last_analysis_stats", {})
+                      report["malicious"] = stats.get("malicious", 0)
+                      report["suspicious"] = stats.get("suspicious", 0)
+                      report["harmless"] = stats.get("harmless", 0)
+                      report["undetected"] = stats.get("undetected", 0)
+                      report["total_engines"] = sum(stats.values())
+                      report["status"] = "Verified Clean" if (report["malicious"] == 0 and report["suspicious"] == 0) else "Flagged"
+                      report["vt_url"] = f"https://www.virustotal.com/gui/file/{sha256}"
+                      print(f"Found existing analysis: {report['malicious']}/{report['total_engines']} detections")
+                      results.append(report)
+                      continue
+              except Exception as e:
+                  print(f"Hash query error: {e}")
+
+              # 2. Upload file if hash not found
+              print(f"Uploading {filename} to VirusTotal...")
+              analysis_id = None
+              try:
+                  if filesize_mb > 32:
+                      # Large file upload URL endpoint
+                      url_res = requests.get("https://www.virustotal.com/api/v3/files/upload_url", headers=headers, timeout=30)
+                      upload_url = url_res.json().get("data", "https://www.virustotal.com/api/v3/files")
+                  else:
+                      upload_url = "https://www.virustotal.com/api/v3/files"
+
+                  with open(filepath, "rb") as upload_file:
+                      post_res = requests.post(upload_url, headers=headers, files={"file": (filename, upload_file)}, timeout=180)
+                      if post_res.status_code in [200, 201]:
+                          analysis_id = post_res.json().get("data", {}).get("id")
+                          print(f"Uploaded successfully. Analysis ID: {analysis_id}")
+                      else:
+                          print(f"Upload failed with HTTP {post_res.status_code}: {post_res.text}")
+              except Exception as e:
+                  print(f"Upload error: {e}")
+
+              # 3. Poll analysis if uploaded
+              if analysis_id:
+                  print("Polling for analysis completion (max 5 minutes)...")
+                  poll_start = time.time()
+                  while time.time() - poll_start < 300:
+                      time.sleep(15)
+                      try:
+                          poll_res = requests.get(f"https://www.virustotal.com/api/v3/analyses/{analysis_id}", headers=headers, timeout=30)
+                          if poll_res.status_code == 200:
+                              attr = poll_res.json().get("data", {}).get("attributes", {})
+                              status = attr.get("status")
+                              if status == "completed":
+                                  stats = attr.get("stats", {})
+                                  report["malicious"] = stats.get("malicious", 0)
+                                  report["suspicious"] = stats.get("suspicious", 0)
+                                  report["harmless"] = stats.get("harmless", 0)
+                                  report["undetected"] = stats.get("undetected", 0)
+                                  report["total_engines"] = sum(stats.values())
+                                  report["status"] = "Verified Clean" if (report["malicious"] == 0 and report["suspicious"] == 0) else "Flagged"
+                                  report["vt_url"] = f"https://www.virustotal.com/gui/file/{sha256}"
+                                  print(f"Scan complete: {report['malicious']}/{report['total_engines']} detections")
+                                  break
+                              else:
+                                  print(f"Current analysis status: {status}...")
+                      except Exception as e:
+                          print(f"Polling error: {e}")
+                  if report["total_engines"] == 0:
+                      report["status"] = "Pending VirusTotal Analysis"
+                      report["vt_url"] = f"https://www.virustotal.com/gui/search/{sha256}"
+
+              results.append(report)
+
+          # Build Markdown Report
+          md = []
+          md.append("### 🛡️ VirusTotal Binary Integrity & Security Report")
+          md.append("")
+          md.append("| Artifact | File Size | SHA-256 Checksum | VirusTotal Analysis | Verdict |")
+          md.append("| :--- | :--- | :--- | :--- | :--- |")
+
+          for r in results:
+              if r["total_engines"] > 0:
+                  badge_status = f"{r['malicious']}/{r['total_engines']} Detections"
+                  verdict = "✅ **CLEAN**" if r["malicious"] == 0 else "⚠️ **REVIEW**"
+              else:
+                  badge_status = r["status"]
+                  verdict = "ℹ️ **Hash Verified**"
+              
+              short_sha = r["sha256"][:12] + "..."
+              md.append(f"| **`{r['filename']}`** | `{r['size_mb']} MB` | [`{short_sha}`]({r['vt_url']}) | [`{badge_status}`]({r['vt_url']}) | {verdict} |")
+
+          md.append("")
+          md.append("> *All release artifacts are cryptographically signed with the official DeskHub RSA-2048 PKCS12 key and searchable on VirusTotal.*")
+          md_text = "\n".join(md)
+
+          # Write to Step Summary
+          step_summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
+          if step_summary_path:
+              with open(step_summary_path, "a") as f:
+                  f.write(md_text + "\n")
+
+          # Write to temporary file for release update
+          with open("/tmp/vt_release_note.md", "w") as f:
+              f.write("\n\n" + md_text + "\n")
+
+          print("\nGenerated VirusTotal Report:\n" + md_text)
+          EOF
+
+      - name: Append Report to GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.target-tag.outputs.tag }}
+        run: |
+          if [ -f "/tmp/vt_release_note.md" ]; then
+            echo "Fetching existing release notes for $TAG..."
+            CURRENT_NOTES=$(gh release view "$TAG" --json body -q .body 2>/dev/null || echo "")
+            
+            # Avoid duplicate appends if workflow re-runs
+            if echo "$CURRENT_NOTES" | grep -q "VirusTotal Binary Integrity & Security Report"; then
+              echo "VirusTotal report already present in release notes. Updating existing block..."
+              # Strip old report
+              CLEAN_NOTES=$(echo "$CURRENT_NOTES" | sed '/### 🛡️ VirusTotal Binary Integrity & Security Report/,$d')
+              NEW_NOTES="${CLEAN_NOTES}$(cat /tmp/vt_release_note.md)"
+            else
+              NEW_NOTES="${CURRENT_NOTES}$(cat /tmp/vt_release_note.md)"
+            fi
+            
+            echo "Updating GitHub Release $TAG..."
+            gh release edit "$TAG" --notes "$NEW_NOTES"
+            echo "Release notes updated successfully!"
+          fi

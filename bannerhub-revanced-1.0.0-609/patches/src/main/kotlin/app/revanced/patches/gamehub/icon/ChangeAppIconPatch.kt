@@ -123,7 +123,7 @@ val changeAppIconPatch = resourcePatch(
             }
         }
 
-        // 3. Clean Neutral Background Vector (prevents solid blue block behind icons)
+        // 3. Clean Neutral Dark Background Vector and Adaptive Icon XMLs
         val bgXml = """<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
@@ -131,20 +131,64 @@ val changeAppIconPatch = resourcePatch(
     android:viewportWidth="108"
     android:viewportHeight="108">
     <path
-        android:fillColor="#111827"
+        android:fillColor="#0B0E14"
         android:pathData="M0,0h108v108h-108z" />
 </vector>
 """.trimIndent()
 
+        val adaptiveIconXml = """<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@drawable/ic_launcher_background" />
+    <foreground android:drawable="@drawable/ic_launcher_foreground" />
+</adaptive-icon>
+""".trimIndent()
+
         val bgFiles = listOf(
             "res/drawable/ic_launcher_background.xml",
-            "res/drawable-v26/ic_launcher_background.xml"
+            "res/drawable-v26/ic_launcher_background.xml",
+            "res/mipmap-anydpi-v26/ic_launcher_background.xml",
+            "res/drawable-anydpi-v26/ic_launcher_background.xml"
         )
         for (bgPath in bgFiles) {
             val bgFile = get(bgPath)
-            if (bgFile.exists() || bgPath == "res/drawable/ic_launcher_background.xml") {
-                bgFile.parentFile?.mkdirs()
-                bgFile.writeText(bgXml)
+            bgFile.parentFile?.mkdirs()
+            bgFile.writeText(bgXml)
+        }
+
+        val adaptiveIconFiles = listOf(
+            "res/mipmap-anydpi-v26/ic_launcher.xml",
+            "res/mipmap-anydpi-v26/ic_launcher_round.xml",
+            "res/drawable-anydpi-v26/ic_launcher.xml",
+            "res/drawable-anydpi-v26/ic_launcher_round.xml",
+            "res/mipmap-v26/ic_launcher.xml",
+            "res/mipmap-v26/ic_launcher_round.xml",
+            "res/drawable-v26/ic_launcher.xml",
+            "res/drawable-v26/ic_launcher_round.xml"
+        )
+        for (xmlPath in adaptiveIconFiles) {
+            val xmlFile = get(xmlPath)
+            if (xmlFile.exists()) {
+                xmlFile.writeText(adaptiveIconXml)
+            }
+        }
+
+        // Neutralize blue ic_launcher_background color if declared in values/colors.xml
+        val colorFiles = listOf(
+            "res/values/colors.xml",
+            "res/values-v26/colors.xml",
+            "res/values-night/colors.xml"
+        )
+        for (cPath in colorFiles) {
+            val cFile = get(cPath)
+            if (cFile.exists()) {
+                var txt = cFile.readText()
+                if (txt.contains("ic_launcher_background")) {
+                    txt = txt.replace(
+                        Regex("""<color name="ic_launcher_background">[^<]+</color>"""),
+                        """<color name="ic_launcher_background">#0B0E14</color>"""
+                    )
+                    cFile.writeText(txt)
+                }
             }
         }
 
