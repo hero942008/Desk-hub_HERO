@@ -1,7 +1,7 @@
 {
   "_comment": "DeskHub Explore manifest.",
-  "version": "1.1.0",
-  "build": 1010000,
+  "version": "1.1.2",
+  "build": 1010200,
   "rails": [
     {
       "type": "hero",
@@ -9,11 +9,11 @@
         {
           "label": "DeskHub emulator",
           "subtitle": "High-performance emulation with Rust Vulkan 1.3/1.4 core",
-          "badge": "DESKHUB v1.1.0",
+          "badge": "DESKHUB v1.1.2",
           "action": "article",
           "icon": "bh_explore_logo",
           "arg": "https://github.com/hero942008/Banerhubhero",
-          "body": "WHAT'S NEW IN DESKHUB EMULATOR v1.1.0\n• Upgraded to version 1.1.0 (Build 1010000)\n• Direct Input & Touch Dispatcher (Direct uinput & Lock-Free SPSC)\n• Google AAudio / Oboe Low-Latency Sound Engine & SIMD Resampling\n• Direct Storage Zstd Memory-Mapped Virtual File System\n• Bare-Metal Inline ARM64 ASM Barriers (ISB/DSB/DMB)\n• Zero-Copy Linux splice/vmsplice Wineserver IPC\n• Ultra-Low CPU Wine & Direct3D (DXVK Async & VKD3D single-queue)\n• Persistent VkPipelineCache on NVMe/UFS storage\n• 100% Offline play & privacy-hardened environment"
+          "body": "WHAT'S NEW IN DESKHUB EMULATOR v1.1.2\n• Upgraded to version 1.1.2 (Build 1010200)\n• Direct Input & Touch Dispatcher (Direct uinput & Lock-Free SPSC)\n• Google AAudio / Oboe Low-Latency Sound Engine & SIMD Resampling\n• Direct Storage Zstd Memory-Mapped Virtual File System\n• Bare-Metal Inline ARM64 ASM Barriers (ISB/DSB/DMB)\n• Zero-Copy Linux splice/vmsplice Wineserver IPC\n• Ultra-Low CPU Wine & Direct3D (DXVK Async & VKD3D single-queue)\n• Persistent VkPipelineCache on NVMe/UFS storage\n• 100% Offline play & privacy-hardened environment"
         }
       ]
     },

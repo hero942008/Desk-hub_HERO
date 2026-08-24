@@ -300,7 +300,7 @@ export default function App() {
                 DeskHub emulator
               </h1>
               <span className="bg-indigo-100 text-indigo-900 dark:bg-indigo-900/50 dark:text-indigo-300 text-xs font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
-                <Zap className="w-3 h-3" /> v1.1.0
+                <Zap className="w-3 h-3" /> v1.1.2
               </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -336,11 +336,11 @@ export default function App() {
         <div className="flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
           <span className="font-medium text-xs md:text-sm">
-            تم ترقية وتحديث <strong className="text-indigo-600 dark:text-indigo-400">DeskHub emulator</strong> إلى إصدار <strong className="text-purple-600 dark:text-purple-400">v1.1.0</strong> مع Direct Input و AAudio و Zstd VFS وتسريع SIMD NEON!
+            تم ترقية وتحديث <strong className="text-indigo-600 dark:text-indigo-400">DeskHub emulator</strong> إلى إصدار <strong className="text-purple-600 dark:text-purple-400">v1.1.2</strong> مع Direct Input و AAudio و Zstd VFS وتسريع SIMD NEON!
           </span>
         </div>
         <span className="text-xs bg-indigo-600 text-white font-mono px-2.5 py-0.5 rounded-full flex items-center gap-1">
-          <Zap className="w-3 h-3" /> v1.1.0 Ready
+          <Zap className="w-3 h-3" /> v1.1.2 Ready
         </span>
       </div>
 
@@ -380,7 +380,7 @@ export default function App() {
           }`}
         >
           <Sparkles className="w-4 h-4 text-purple-500" />
-          سجل التغييرات v1.1.0 (Changelog) 🚀
+          سجل التغييرات v1.1.2 (Changelog) 🚀
         </button>
         <button
           id="tab-overview"
@@ -568,20 +568,20 @@ export default function App() {
 
         {activeTab === "changelog" && (
           <div className="space-y-6">
-            {/* Header Badge v1.1.0 */}
+            {/* Header Badge v1.1.2 */}
             <div className="bg-gradient-to-r from-purple-900/40 via-indigo-900/30 to-slate-900/40 p-6 rounded-2xl border border-purple-500/30 shadow-lg">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <span className="bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full font-mono">
-                      LATEST RELEASE v1.1.0 (Build 1010000)
+                      LATEST RELEASE v1.1.2 (Build 1010200)
                     </span>
                     <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs px-2.5 py-0.5 rounded-full font-medium">
                       Direct Input, AAudio & Zstd VFS
                     </span>
                   </div>
                   <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight">
-                    سجل التغييرات الرسمي لإصدار DeskHub v1.1.0 (Latest)
+                    سجل التغييرات الرسمي لإصدار DeskHub v1.1.2 (Latest)
                   </h2>
                   <p className="text-xs md:text-sm text-purple-200/80 mt-1">
                     تقرير شامل ومفصل بكافة التحديثات المطبقة: معالجة الإدخال المباشر uinput، محرك الصوت AAudio عالي السرعة، نظام الملفات Zstd VFS، وقيود الذاكرة المباشرة بلغة التجميع ARM64.
@@ -589,7 +589,7 @@ export default function App() {
                 </div>
                 <button
                   onClick={() => {
-                    const text = `WHAT'S NEW IN DESKHUB EMULATOR v1.1.0\n• Upgraded release version to v1.1.0 (Build 1010000)\n• Direct Input & Touch Dispatcher: Sub-millisecond direct touch and mouse routing bypassing JVM Garbage Collector loops with lock-free atomic SPSC ring buffers\n• AAudio / Oboe Low-Latency Sound Engine: Zero-underrun audio streaming with hardware SIMD sample interpolation and volume gain scaling\n• Memory-Mapped Zstd VFS Engine: Multi-threaded compressed package loader speeding up Windows game asset loading times by 3-5x\n• Bare-Metal Inline ARM64 ASM Barriers: Native dmb ish / isb assembly fences for heterogeneous Big.LITTLE multi-core CPUs\n• Zero-Copy Wineserver IPC Proxy: Linux splice/vmsplice kernel zero-copy pipes for instantaneous Wine IPC\n• ARM NEON (aarch64) and AVX2 (x86_64) SIMD 128-byte unrolled frame readout pipeline\n• High-Resolution 4K App Icon & Modern Hexagonal Cybernetic Design\n• 9 Side-by-Side Optimized Variants for Snapdragon & Dimensity`;
+                    const text = `WHAT'S NEW IN DESKHUB EMULATOR v1.1.2\n• Upgraded release version to v1.1.2 (Build 1010200)\n• Direct Input & Touch Dispatcher: Sub-millisecond direct touch and mouse routing bypassing JVM Garbage Collector loops with lock-free atomic SPSC ring buffers\n• AAudio / Oboe Low-Latency Sound Engine: Zero-underrun audio streaming with hardware SIMD sample interpolation and volume gain scaling\n• Memory-Mapped Zstd VFS Engine: Multi-threaded compressed package loader speeding up Windows game asset loading times by 3-5x\n• Bare-Metal Inline ARM64 ASM Barriers: Native dmb ish / isb assembly fences for heterogeneous Big.LITTLE multi-core CPUs\n• Zero-Copy Wineserver IPC Proxy: Linux splice/vmsplice kernel zero-copy pipes for instantaneous Wine IPC\n• ARM NEON (aarch64) and AVX2 (x86_64) SIMD 128-byte unrolled frame readout pipeline\n• High-Resolution 4K App Icon & Modern Hexagonal Cybernetic Design\n• 9 Side-by-Side Optimized Variants for Snapdragon & Dimensity`;
                     navigator.clipboard.writeText(text);
                     setCopied(true);
                     setTimeout(() => setCopied(false), 2000);
@@ -597,12 +597,12 @@ export default function App() {
                   className="flex items-center gap-2 px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-semibold transition-all shrink-0 shadow-md"
                 >
                   {copied ? <Check className="w-4 h-4 text-emerald-300" /> : <Copy className="w-4 h-4" />}
-                  {copied ? "تم نسخ السجل!" : "نسخ نص سجل v1.1.0"}
+                  {copied ? "تم نسخ السجل!" : "نسخ نص سجل v1.1.2"}
                 </button>
               </div>
             </div>
 
-            {/* Detailed Changelog Cards v1.1.0 */}
+            {/* Detailed Changelog Cards v1.1.2 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Feature 1 */}
               <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
@@ -696,12 +696,12 @@ export default function App() {
             {/* In-App Explore Body Format */}
             <div className="bg-slate-900 text-slate-100 p-6 rounded-xl border border-slate-800 space-y-3 font-mono text-xs">
               <div className="flex items-center justify-between text-slate-400 text-[11px]">
-                <span>نص السجل المدمج مباشرة داخل شاشة Explore في تطبيق DeskHub v1.1.0:</span>
+                <span>نص السجل المدمج مباشرة داخل شاشة Explore في تطبيق DeskHub v1.1.2:</span>
                 <span className="text-purple-400">explore/bh_explore.json & BhExploreManifest</span>
               </div>
               <pre className="bg-slate-950 p-4 rounded-lg text-emerald-400 leading-relaxed overflow-x-auto">
-{`WHAT'S NEW IN DESKHUB EMULATOR v1.1.0
-• Upgraded release version to v1.1.0 (Build 1010000)
+{`WHAT'S NEW IN DESKHUB EMULATOR v1.1.2
+• Upgraded release version to v1.1.2 (Build 1010200)
 • Direct Input & Touch Dispatcher: Sub-millisecond direct touch and mouse routing bypassing JVM Garbage Collector loops with lock-free atomic SPSC ring buffers
 • AAudio / Oboe Low-Latency Sound Engine: Zero-underrun audio streaming with hardware SIMD sample interpolation and volume gain scaling
 • Memory-Mapped Zstd VFS Engine: Multi-threaded compressed package loader speeding up Windows game asset loading times by 3-5x

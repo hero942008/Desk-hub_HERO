@@ -1,19 +1,19 @@
-# 🚀 DeskHub v1.1.0 — Official Technical Changelog & Bare-Metal Rust Release
+# 🚀 DeskHub v1.1.2 — Official Technical Changelog & Bare-Metal Rust Release
 
 > **Product:** DeskHub Windows Emulator & Vulkan 1.4 Native Acceleration Core  
 > **Package Identifier:** `com.xj.herohuboptimized` (and side-by-side variants)  
-> **Target Release:** Version 1.1.0 (Build 1010000)  
+> **Target Release:** Version 1.1.2 (Build 1010200)  
 > **Lead Architect / System Engineering Report**
 
 ---
 
-## 📑 Executive Summary v1.1.0
+## 📑 Executive Summary v1.1.2
 
-DeskHub v1.1.0 expands native Rust execution into the operating system layers of the emulator: Direct Linux Input (`uinput` / `AInputQueue`), Google AAudio lock-free sound rendering with hardware SIMD interpolation, memory-mapped Zstandard compressed Virtual File System (`Zstd VFS`), and direct bare-metal inline ARM64 assembly memory barriers (`ISB` / `DSB` / `DMB`).
+DeskHub v1.1.2 expands native Rust execution into the operating system layers of the emulator: Direct Linux Input (`uinput` / `AInputQueue`), Google AAudio lock-free sound rendering with hardware SIMD interpolation, memory-mapped Zstandard compressed Virtual File System (`Zstd VFS`), and direct bare-metal inline ARM64 assembly memory barriers (`ISB` / `DSB` / `DMB`).
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                              DESKHUB v1.1.0 ARCHITECTURE                        │
+│                              DESKHUB v1.1.2 ARCHITECTURE                        │
 ├─────────────────────────┬───────────────────────────────┬───────────────────────┤
 │   Direct Input & Audio  │     Memory & File Systems     │   Kernel & Hardware   │
 │  • Direct Linux uinput  │  • Multi-threaded Zstd VFS    │  • ARM64 Inline ASM   │

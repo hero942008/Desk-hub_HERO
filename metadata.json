@@ -1,6 +1,6 @@
 {
   "name": "DeskHub emulator",
-  "description": "DeskHub emulator v1.1.0 - Ultra-high performance GameHub Android ReVanced modification with Rust Vulkan 1.3/1.4 native core, Direct Input uinput dispatcher, AAudio Oboe lock-free audio engine, memory-mapped Zstd VFS loader, and automated GitHub Actions CI/CD APK build pipelines.",
+  "description": "DeskHub emulator v1.1.2 - Ultra-high performance GameHub Android ReVanced modification with Rust Vulkan 1.3/1.4 native core, Direct Input uinput dispatcher, AAudio Oboe lock-free audio engine, memory-mapped Zstd VFS loader, and automated GitHub Actions CI/CD APK build pipelines.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

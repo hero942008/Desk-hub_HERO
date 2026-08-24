@@ -14,9 +14,9 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version string for APK filenames + release tag (e.g. "1.1.0-609-opt" or "1.1.0").'
+        description: 'Version string for APK filenames + release tag (e.g. "1.1.2-609-opt" or "1.1.2").'
         required: false
-        default: "1.1.0"
+        default: "1.1.2"
       stable:
         description: "Cut a stable GitHub Release with APK assets"
         type: boolean
@@ -83,7 +83,7 @@ jobs:
           elif [[ "${GITHUB_REF_NAME}" == v* ]] || [[ "${GITHUB_REF_NAME}" == DeskHub-* ]] || [[ "${GITHUB_REF_NAME}" == GameHub-* ]] || [[ "${GITHUB_REF_NAME}" == HeroHub-* ]]; then
             RAW="${GITHUB_REF_NAME}"
           else
-            RAW="1.1.0"
+            RAW="1.1.2"
           fi
           VERSION="${RAW#v}"
           VERSION="${VERSION#DeskHub-}"
@@ -230,11 +230,62 @@ jobs:
           java -jar shared/revanced-cli.jar patch shared/GameHub_6.0.9.apk \
             --patches shared/patches.rvp \
             --bypass-verification \
-            -e "Change package name" \
-              -O 'packageName="${{ matrix.variant.pkg }}"' \
-              -O 'updatePermissions=true' \
-              -O 'updateProviders=true' \
+            -e "Change package name" -O 'packageName="${{ matrix.variant.pkg }}"' -O 'updatePermissions=true' -O 'updateProviders=true' \
             -e "Change app name" -O 'appName="${{ matrix.variant.label }}"' \
+            -e "Change app icon" \
+            -e "Strip cloud gaming" \
+            -e "Disable Aliyun NumberAuth" \
+            -e "Disable Firebase Crashlytics" \
+            -e "Strip Ad-ID permissions" \
+            -e "Disable Firebase Analytics" \
+            -e "Stub analytics events" \
+            -e "Disable Mob Push tracking" \
+            -e "Disable Firebase auto-init" \
+            -e "Disable heartbeat" \
+            -e "Disable GMS Measurement" \
+            -e "Bypass login" \
+            -e "Prefix API path with /v6" \
+            -e "Redirect catalog API" \
+            -e "External launcher support" \
+            -e "Show PC Game Settings row" \
+            -e "Offline component picker — local list" \
+            -e "Rewrite custom permissions per variant" \
+            -e "Disable OTA updates" \
+            -e "Debug logging" \
+            -e "In-game Steam chat overlay" \
+            -e "Steam chat ringtone assets" \
+            -e "Steam chat voice permission" \
+            -e "Steam chat image-picker activity" \
+            -e "Steam chat ringtone-picker activity" \
+            -e "Explore version stamp" \
+            -e "Explore tab hijack" \
+            -e "Explore drawables" \
+            -e "Explore manifest asset" \
+            -e "Explore screen activity" \
+            -e "PC-accurate vibration" \
+            -e "Vibration settings activity" \
+            -e "PC Vibration Settings label resource" \
+            -e "PC Vibration Settings menu row" \
+            -e "File manager access" \
+            -e "Local game-id assignment" \
+            -e "Banner Tools drawables" \
+            -e "Banner Tools menu row" \
+            -e "Show Game ID menu row" \
+            -e "Show Game ID label resource" \
+            -e "PulseAudio recording-mode setup" \
+            -e "PulseAudio recording-mode manifest" \
+            -e "Per-game menu id capture (shared)" \
+            -e "In-game performance overlay" \
+            -e "GPU spoof settings activity" \
+            -e "GPU spoof DXVK plumbing" \
+            -e "GPU Spoof menu row" \
+            -e "GOG library card in Explore" \
+            -e "GOG manifest entries" \
+            -e "GOG menu row" \
+            -e "Renderer menu row" \
+            -e "Renderer legacy library bundle" \
+            -e "Renderer swap implementation" \
+            -e "Renderer manifest entries" \
             --out "out/${FILENAME}"
           ls -la "out/${FILENAME}"
 
