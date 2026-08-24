@@ -1,6 +1,6 @@
 # 🚀 DeskHub — Next-Gen Windows Emulator & Vulkan 1.4 Native Acceleration Core
 
-<img src="Deck.png" alt="Deck">
+<img src="Deck.png"   alt="Deck">
 
 
 [![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20Wine%20%7C%20ARM64-blue.svg)](https://github.com/)
