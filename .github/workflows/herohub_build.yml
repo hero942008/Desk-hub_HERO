@@ -15,15 +15,15 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version string for APK filenames (e.g. "1.1.2" or "1.1.2-609")'
+        description: 'Version string for APK filenames (e.g. "1.3.0")'
         required: false
-        default: "1.1.2"
+        default: "1.3.0"
       create_release:
         description: "Create a GitHub Release with APK assets"
         type: boolean
         default: true
       base_apk_url:
-        description: "Direct URL to base GameHub 6.0.9 APK if not in repo releases"
+        description: "Direct URL to base GameHub 6.1.1 APK if not in repo releases"
         required: false
         default: ""
 
@@ -49,12 +49,13 @@ jobs:
           set -e
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.version }}" ]; then
             RAW="${{ github.event.inputs.version }}"
-          elif [[ "${GITHUB_REF_NAME}" == v* ]] || [[ "${GITHUB_REF_NAME}" == DeskHub-* ]] || [[ "${GITHUB_REF_NAME}" == HeroHub-* ]]; then
+          elif [[ "${GITHUB_REF_NAME}" == v* ]] || [[ "${GITHUB_REF_NAME}" == DeskHub-* ]] || [[ "${GITHUB_REF_NAME}" == HeroHub-* ]] || [[ "${GITHUB_REF_NAME}" == BannerHub-* ]]; then
             RAW="${GITHUB_REF_NAME#v}"
             RAW="${RAW#DeskHub-}"
             RAW="${RAW#HeroHub-}"
+            RAW="${RAW#BannerHub-}"
           else
-            RAW="1.1.2"
+            RAW="1.3.0"
           fi
           VERSION="${RAW#v}"
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
@@ -63,7 +64,10 @@ jobs:
 
       - name: Auto-detect workspace directory
         run: |
-          if [ -d "bannerhub-revanced-1.0.0-609" ] && [ -f "bannerhub-revanced-1.0.0-609/gradlew" ]; then
+          if [ -d "bannerhub-revanced-base-apk-611" ] && [ -f "bannerhub-revanced-base-apk-611/gradlew" ]; then
+            echo "Working from bannerhub-revanced-base-apk-611 directory..."
+            rsync -a --delete bannerhub-revanced-base-apk-611/ . || cp -rf bannerhub-revanced-base-apk-611/* .
+          elif [ -d "bannerhub-revanced-1.0.0-609" ] && [ -f "bannerhub-revanced-1.0.0-609/gradlew" ]; then
             echo "Working from bannerhub-revanced-1.0.0-609 directory..."
             rsync -a --delete bannerhub-revanced-1.0.0-609/ . || cp -rf bannerhub-revanced-1.0.0-609/* .
           fi
@@ -134,7 +138,7 @@ jobs:
           curl -L https://github.com/ReVanced/revanced-cli/releases/download/v6.0.0/revanced-cli-6.0.0-all.jar \
             -o revanced-cli.jar
 
-      - name: Fetch Base GameHub 6.0.9 APK
+      - name: Fetch Base GameHub APK (6.1.1 / 6.0.9)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CUSTOM_URL: ${{ github.event.inputs.base_apk_url }}
@@ -142,19 +146,22 @@ jobs:
           set +e
           if [ -n "$CUSTOM_URL" ]; then
             echo "Downloading from custom URL: $CUSTOM_URL"
-            curl -f -L "$CUSTOM_URL" -o GameHub_6.0.9.apk
+            curl -f -L "$CUSTOM_URL" -o GameHub_Base.apk
           else
             echo "Attempting to fetch base APK from official release mirrors..."
-            curl -f -L --retry 3 --connect-timeout 15 "https://github.com/The412Banner/bannerhub-revanced/releases/download/base-apk-609/GameHub_6.0.9.apk" -o GameHub_6.0.9.apk || \
-            gh release download base-apk-609 --pattern "GameHub_6.0.9.apk" --repo ${{ github.repository }} --output GameHub_6.0.9.apk 2>/dev/null || \
-            gh release download base-apk-609 --pattern "GameHub_6.0.9.apk" --repo "The412Banner/bannerhub-revanced" --output GameHub_6.0.9.apk 2>/dev/null || \
-            curl -f -L --retry 3 --connect-timeout 15 "https://archive.org/download/gamehub-base-6.0.9/GameHub_6.0.9.apk" -o GameHub_6.0.9.apk || \
-            curl -f -L --retry 3 --connect-timeout 15 "https://github.com/user-attachments/files/GameHub_6.0.9.apk" -o GameHub_6.0.9.apk
+            curl -f -L --retry 3 --connect-timeout 15 "https://github.com/The412Banner/bannerhub-revanced/releases/download/base-apk-611/GameHub_6.1.1.apk" -o GameHub_Base.apk || \
+            gh release download base-apk-611 --pattern "GameHub_6.1.1.apk" --repo ${{ github.repository }} --output GameHub_Base.apk 2>/dev/null || \
+            gh release download base-apk-611 --pattern "GameHub_6.1.1.apk" --repo "The412Banner/bannerhub-revanced" --output GameHub_Base.apk 2>/dev/null || \
+            curl -f -L --retry 3 --connect-timeout 15 "https://github.com/The412Banner/bannerhub-revanced/releases/download/base-apk-609/GameHub_6.0.9.apk" -o GameHub_Base.apk || \
+            gh release download base-apk-609 --pattern "GameHub_6.0.9.apk" --repo ${{ github.repository }} --output GameHub_Base.apk 2>/dev/null || \
+            gh release download base-apk-609 --pattern "GameHub_6.0.9.apk" --repo "The412Banner/bannerhub-revanced" --output GameHub_Base.apk 2>/dev/null || \
+            curl -f -L --retry 3 --connect-timeout 15 "https://archive.org/download/gamehub-base-6.0.9/GameHub_6.0.9.apk" -o GameHub_Base.apk || \
+            curl -f -L --retry 3 --connect-timeout 15 "https://github.com/user-attachments/files/GameHub_6.0.9.apk" -o GameHub_Base.apk
           fi
-          if [ -f GameHub_6.0.9.apk ] && [ -s GameHub_6.0.9.apk ]; then
-            echo "Base APK successfully acquired ($(du -h GameHub_6.0.9.apk | cut -f1))."
+          if [ -f GameHub_Base.apk ] && [ -s GameHub_Base.apk ]; then
+            echo "Base APK successfully acquired ($(du -h GameHub_Base.apk | cut -f1))."
           else
-            echo "::warning:: Base GameHub 6.0.9 APK could not be fetched from mirrors; generating standalone patches bundle & extensions."
+            echo "::warning:: Base GameHub APK could not be fetched from mirrors; generating standalone patches bundle & extensions."
           fi
           set -e
 
@@ -162,7 +169,7 @@ jobs:
         run: |
           mkdir -p shared
           cp revanced-cli.jar shared/
-          [ -f GameHub_6.0.9.apk ] && cp GameHub_6.0.9.apk shared/ || true
+          [ -f GameHub_Base.apk ] && cp GameHub_Base.apk shared/ || true
           cp $(find patches/build/libs -name "*.rvp" ! -name "*-javadoc*" ! -name "*-sources*" | head -1) shared/patches.rvp
           cp patches/build/libs/*.rvp shared/ 2>/dev/null || true
           mkdir -p shared/rve
@@ -184,16 +191,16 @@ jobs:
       fail-fast: false
       matrix:
         variant:
-          - { name: Optimized,       pkg: "com.xj.herohuboptimized", label: "DeskHub emulator" }
-          - { name: Normal,          pkg: "banner.hub",             label: "DeskHub Normal" }
-          - { name: Lite,            pkg: "gamehub.lite",            label: "DeskHub Lite" }
-          - { name: PuBG,            pkg: "com.tencent.ig",          label: "DeskHub PuBG" }
-          - { name: AnTuTu,          pkg: "com.antutu.ABenchMark",   label: "DeskHub AnTuTu" }
-          - { name: alt-AnTuTu,      pkg: "com.antutu.benchmark.full", label: "DeskHub alt-AnTuTu" }
-          - { name: PuBG-CrossFire,  pkg: "com.tencent.tmgp.cf",     label: "DeskHub CrossFire" }
-          - { name: Ludashi,         pkg: "com.ludashi.aibench",     label: "DeskHub Ludashi" }
-          - { name: Genshin,         pkg: "com.miHoYo.GenshinImpact", label: "DeskHub Genshin" }
-          - { name: Original,        pkg: "com.xiaoji.egggame",      label: "GameHub" }
+          - { name: Optimized,       pkg: "com.xj.herohuboptimized", label: "DeskHub ALPHA test v6 1.3.0" }
+          - { name: Normal,          pkg: "banner.hub",             label: "DeskHub ALPHA test v6 1.3.0" }
+          - { name: Lite,            pkg: "gamehub.lite",            label: "DeskHub ALPHA test v6 1.3.0 (Lite)" }
+          - { name: PuBG,            pkg: "com.tencent.ig",          label: "DeskHub ALPHA test v6 1.3.0 (PuBG)" }
+          - { name: AnTuTu,          pkg: "com.antutu.ABenchMark",   label: "DeskHub ALPHA test v6 1.3.0 (AnTuTu)" }
+          - { name: alt-AnTuTu,      pkg: "com.antutu.benchmark.full", label: "DeskHub ALPHA test v6 1.3.0 (alt-AnTuTu)" }
+          - { name: PuBG-CrossFire,  pkg: "com.tencent.tmgp.cf",     label: "DeskHub ALPHA test v6 1.3.0 (CrossFire)" }
+          - { name: Ludashi,         pkg: "com.ludashi.aibench",     label: "DeskHub ALPHA test v6 1.3.0 (Ludashi)" }
+          - { name: Genshin,         pkg: "com.miHoYo.GenshinImpact", label: "DeskHub ALPHA test v6 1.3.0 (Genshin)" }
+          - { name: Original,        pkg: "com.xiaoji.egggame",      label: "DeskHub ALPHA test v6 1.3.0" }
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -220,15 +227,24 @@ jobs:
         run: |
           set -e
           mkdir -p out
-          if [ -f "shared/GameHub_6.0.9.apk" ]; then
-            echo "Applying DeskHub high-performance patches with package ${{ matrix.variant.pkg }}..."
-            java -jar shared/revanced-cli.jar patch shared/GameHub_6.0.9.apk \
+          BASE_APK=""
+          if [ -f "shared/GameHub_Base.apk" ]; then
+            BASE_APK="shared/GameHub_Base.apk"
+          elif [ -f "shared/GameHub_6.1.1.apk" ]; then
+            BASE_APK="shared/GameHub_6.1.1.apk"
+          elif [ -f "shared/GameHub_6.0.9.apk" ]; then
+            BASE_APK="shared/GameHub_6.0.9.apk"
+          fi
+
+          if [ -n "$BASE_APK" ]; then
+            echo "Applying DeskHub high-performance patches to $BASE_APK with package ${{ matrix.variant.pkg }}..."
+            java -jar shared/revanced-cli.jar patch "$BASE_APK" \
               --patches shared/patches.rvp \
               --bypass-verification \
               -e "Change package name" -O 'packageName="${{ matrix.variant.pkg }}"' -O 'updatePermissions=true' -O 'updateProviders=true' \
               -e "Change app name" -O 'appName="${{ matrix.variant.label }}"' \
               -e "Change app icon" \
-              -e "Strip cloud gaming" \
+              -d "Strip cloud gaming" \
               -e "Disable Aliyun NumberAuth" \
               -e "Disable Firebase Crashlytics" \
               -e "Strip Ad-ID permissions" \
@@ -397,19 +413,20 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ needs.build-patches.outputs.tag }}
-          name: DeskHub emulator ${{ needs.build-patches.outputs.version }}
+          name: DeskHub ALPHA test v6 ${{ needs.build-patches.outputs.version }}
           make_latest: true
           draft: false
           prerelease: false
           fail_on_unmatched_files: false
           generate_release_notes: false
           body: |
-            # 🚀 DeskHub emulator ${{ needs.build-patches.outputs.version }}
+            # 🚀 DeskHub ALPHA test v6 ${{ needs.build-patches.outputs.version }}
             
-            High-performance modification of GameHub 6.0.9 featuring ultra-fast Rust native core, Vulkan 1.4 zero-copy rendering, and optimized CPU scheduling.
+            High-performance modification of GameHub 6.1.1 featuring ultra-fast Rust native core, Vulkan 1.4 zero-copy rendering, AAudio lock-free audio engine, and optimized CPU scheduling.
             
             ### ⚡ Performance Features
-            - **Package Name:** `com.xj.herohuboptimized` (plus 9 side-by-side variants)
+            - **App Name:** DeskHub ALPHA test v6 1.3.0
+            - **Version:** ${{ needs.build-patches.outputs.version }} (1.3.0)
             - **Primary Renderer:** Direct-to-Display Native Vulkan 1.4 & Dynamic Rendering
             - **Shader Pipeline:** DXVK 2.4 Async (`DXVK_ASYNC=1`) & Single-Queue Direct3D 12
             - **Kernel Synchronization:** Ultra-low latency Futex / Fsync / Esync
@@ -434,12 +451,12 @@ jobs:
           if ! gh release view "$TAG" >/dev/null 2>&1; then
             echo "Release $TAG does not exist yet. Creating via gh CLI..."
             gh release create "$TAG" \
-              --title "DeskHub emulator $VER" \
-              --notes "DeskHub emulator $VER - High-Performance Vulkan 1.4 Native Core" \
+              --title "DeskHub ALPHA test v6 $VER" \
+              --notes "DeskHub ALPHA test v6 $VER - High-Performance Vulkan 1.4 & Rust Native Core" \
               --latest || \
             gh release create "$TAG" \
-              --title "DeskHub emulator $VER" \
-              --notes "DeskHub emulator $VER - High-Performance Vulkan 1.4 Native Core" \
+              --title "DeskHub ALPHA test v6 $VER" \
+              --notes "DeskHub ALPHA test v6 $VER - High-Performance Vulkan 1.4 & Rust Native Core" \
               --target "${{ github.sha }}" \
               --latest || true
           fi
